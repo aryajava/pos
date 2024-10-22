@@ -11,6 +11,7 @@ dotenv.config();
 
 const __dirname = import.meta.dirname;
 
+import authRouter from './routes/auth.js';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 
@@ -58,7 +59,8 @@ app.use(
   })
 );
 
-app.use('/', indexRouter);
+app.use('/', authRouter);
+app.use('/dashboard', indexRouter);
 
 app.use(function (_, __, next) {
   next(createError(404));
