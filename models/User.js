@@ -5,36 +5,71 @@ dotenv.config();
 
 
 export default class User {
-  constructor(email, password) {
+  constructor(email, name, password, role) {
     this.email = email;
+    this.name = name;
     this.password = password;
+    this.role = role;
   }
 
-  async save() {
-    const query = {
-      text: 'INSERT INTO users(email, password) VALUES($1, $2) RETURNING *',
-      values: [this.email, await bcrypt.hash(this.password, 10)],
-    };
-
+  static async save(email, name, password, role) {
     try {
-      const { rows } = await pool.query(query);
-      return rows[0];
+      const query = `INSERT INTO ${process.env.DB_TABLE_USER} (email, name, password, role) VALUES ($1, $2, $3, $4) RETURNING *`;
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const result = await pool.query(query, [email, name, hashedPassword, role]);
+      return result.rows[0];
     } catch (error) {
-      return error;
+      throw new Error(error);
+    }
+  }
+
+  static async findAll() {
+    try {
+      const query = `SELECT * FROM users`;
+      const result = await pool.query(query);
+      return result.rows;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  static async findById(id) {
+    try {
+      const query = `SELECT * FROM ${process.env.DB_TABLE_USER} WHERE userid = $1 LIMIT 1`;
+      const result = await pool.query(query, [id]);
+      return result.rows[0];
+    } catch (error) {
+      throw new Error(error);
     }
   }
 
   static async findByEmail(email) {
-    const query = {
-      text: 'SELECT * FROM users WHERE email = $1 LIMIT 1',
-      values: [email],
-    };
-
     try {
-      const { rows } = await pool.query(query);
-      return rows[0];
+      const query = `SELECT * FROM ${process.env.DB_TABLE_USER} WHERE email = $1 LIMIT 1`;
+      const result = await pool.query(query, [email]);
+      return result.rows[0];
     } catch (error) {
-      return error;
+      throw new Error(error);
+    }
+  }
+
+  static async update(email, name, role, id) {
+    try {
+      const query = `UPDATE users SET email = $1, name = $2, role = $3 WHERE userid = $4 RETURNING *`;
+      const result = await pool.query(query, [email, name, role, id]);
+      return result.rows[0];
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  static async delete(id) {
+    try {
+      const query = `DELETE FROM users WHERE userid = $1 RETURNING *`;
+      const result = await pool.query(query, [id]);
+      return result.rows[0];
+    } catch (error) {
+      throw new Error(error);
     }
   }
 }
