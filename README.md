@@ -1,6 +1,6 @@
 # Point of Sale
 
-> 
+> Poin of Sales Application
 
 This project is Point of Sale Application. built using Express JS and EJS for templating, while PostgreSQL is used as the database. The frontend is using [Start Bootstrap - SB Admin 2](https://github.com/StartBootstrap/startbootstrap-sb-admin-2).
 
