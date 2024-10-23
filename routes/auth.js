@@ -18,7 +18,7 @@ router.get('/logout', function (req, res, next) {
   res.redirect('/');
 });
 
-router.post('/login', checkSessionAuth, authLoginValidation, async function (req, res, next) {
+router.post('/', checkSessionAuth, authLoginValidation, async function (req, res, next) {
   const { email, password } = req.body;
   try {
     const user = await Auth.findByEmail(email);
