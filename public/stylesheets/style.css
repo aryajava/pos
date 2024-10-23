@@ -2,6 +2,10 @@
   background-color: black !important;
 }
 
+label {
+  margin-bottom: 0;
+}
+
 .pagination .dt-paging-button .page-link.first,
 .pagination .dt-paging-button .page-link.last {
   display: none !important;
@@ -9,4 +13,28 @@
 
 div.table-responsive>div.dt-container>div.row {
   margin: 0 0 0.5rem 0 !important;
+}
+
+/* Menyesuaikan ikon urutan */
+.dt-column-order::after {
+  font-size: 1.2em;
+  /* Sesuaikan ukurannya sesuai kebutuhan */
+}
+
+/* Contoh jika Anda mengatur urutan naik */
+.dt-ordering-asc .dt-column-order::after {
+  font-size: 1.2em;
+  /* Sesuaikan ukurannya */
+}
+
+/* Contoh jika Anda mengatur urutan turun */
+.dt-ordering-desc .dt-column-order::after {
+  font-size: 1.2em;
+  /* Sesuaikan ukurannya */
+}
+
+
+table.dataTable th.dt-type-numeric,
+table.dataTable td.dt-type-numeric {
+  text-align: left !important;
 }
