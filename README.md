@@ -25,10 +25,13 @@ npm install
 Create a `.env` file in the root of your project and add the following lines:
 
 ```bash
-MONGODB_URI=your_uri_here
+DB_HOST=your_db_host_here
+DB_PORT=your_db_port_here
 DB_NAME=your_db_name_here
-USERS_COLLECTION=your_collection_for_users_here
-TODOS_COLLECTION=your_collection_for_todos_here
+DB_USER=your_db_user_here
+DB_PASSWORD=your_db_password_here
+DB_TABLE_USER=your_db_table_user_here
+SESSION_SECRET=your_session_secret_here
 ```
 
 ## Usage
