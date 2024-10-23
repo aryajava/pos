@@ -5,7 +5,10 @@ const router = express.Router();
 
 /* GET home page. */
 router.get('/', checkSession, function (req, res, next) {
-  res.render('index', { title: req.session.user.email });
+  res.render('index', {
+    user: req.session.user,
+    title: `Dashboard`,
+  });
 });
 
 export default router;

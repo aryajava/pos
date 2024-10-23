@@ -61,6 +61,7 @@ app.use(
 
 app.use('/', authRouter);
 app.use('/dashboard', indexRouter);
+app.use('/users', usersRouter);
 
 app.use(function (_, __, next) {
   next(createError(404));
