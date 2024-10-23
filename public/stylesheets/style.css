@@ -1,3 +1,12 @@
 .bg-logo-login {
   background-color: black !important;
 }
+
+.pagination .dt-paging-button .page-link.first,
+.pagination .dt-paging-button .page-link.last {
+  display: none !important;
+}
+
+div.table-responsive>div.dt-container>div.row {
+  margin: 0 0 0.5rem 0 !important;
+}
