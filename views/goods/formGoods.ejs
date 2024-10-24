@@ -1,0 +1,157 @@
+<%- include('../partials/layoutTop') %>
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <%- include('../partials/sidebar') %>
+      <!-- End of Sidebar -->
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <%- include('../partials/topbar') %>
+            <!-- End of Topbar -->
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+              <!-- Page Heading -->
+              <h1 class="h3 mb-2 text-gray-800">
+                <%= titlePage %>
+              </h1>
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <h6 class="m-0 font-weight-bold text-primary">
+                    <%= titleForm %>
+                  </h6>
+                </div>
+                <form action="/goods/<%= goodsData ? 'edit/' + goodsData.unit : 'add' %>" method="POST">
+                  <div class="card-body">
+                    <%- include('../partials/alert') %>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="barcode">Barcode</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <input type="text" class="form-control" id="barcode" name="barcode"
+                            value="<%= goodsData ? goodsData.barcode : '' %>" autocomplete="off" required>
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="name">Name</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <input type="text" class="form-control" id="name" name="name"
+                            value="<%= goodsData ? goodsData.name : '' %>" autocomplete="off" required>
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="stock">Stock</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <input type="number" class="form-control" id="stock" name="stock"
+                            value="<%= goodsData ? goodsData.stock : 0 %>" autocomplete="off" required min="0">
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="purchaseprice">Purchase Price</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <input type="number" class="form-control" id="purchaseprice" name="purchaseprice"
+                            value="<%= goodsData ? goodsData.purchaseprice : 0 %>" autocomplete="off" required min="0">
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="sellingprice">Selling Price</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <input type="number" class="form-control" id="sellingprice" name="sellingprice"
+                            value="<%= goodsData ? goodsData.sellingprice : 0 %>" autocomplete="off" required min="0">
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="unit">Unit</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <select class="form-control" name="unit" id="unit"></select>
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col-md-2 align-self-center">
+                          <label for="imageInput">Picture</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <input type="file" class="form-control-file" id="imageInput" name="picture" accept="image/*">
+                        </div>
+                      </div>
+                      <div class="row form-group" id="previewRow" style="display: none;">
+                        <div class="col-md-2 align-self-top">
+                          <label for="preview">Preview</label>
+                        </div>
+                        <div class="col-md-10 align-self-center">
+                          <img id="preview" src="<%= goodsData ? goodsData.picture : '' %>" alt="Image Preview"
+                            style="max-width: 100%; height: auto;">
+                        </div>
+                      </div>
+                  </div>
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-success btn-icon-split">
+                      <span class="icon text-white-50">
+                        <i class="fas fa-database"></i>
+                      </span>
+                      <span class="text">Save</span>
+                    </button>
+                    <a href="/goods" class="btn btn-warning btn-icon-split">
+                      <span class="icon text-white-50">
+                        <i class="fas fa-undo"></i>
+                      </span>
+                      <span class="text">Cancel</span>
+                    </a>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <%- include('../partials/footer') %>
+          <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+  </div>
+  <!-- End of Page Wrapper -->
+  <%- include('../partials/baseScripts') %>
+    <script>
+      $('#unit').select2({
+        placeholder: "Select a unit",
+        allowClear: true,
+        theme: 'bootstrap4',
+        ajax: {
+          url: '/units/api/units',
+          dataType: 'json',
+          data: function (params) {
+            return {
+              q: params.term
+            };
+          },
+          processResults: function (data) {
+            return {
+              results: data.data.map(function (item) {
+                return {
+                  id: item.unit,
+                  text: item.name
+                };
+              })
+            };
+          },
+          cache: false
+        },
+      });
+    </script>
+    <script src="/javascripts/imagePreview.js"></script>
+    <%- include('../partials/layoutBottom') %>

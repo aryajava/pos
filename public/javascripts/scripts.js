@@ -40,12 +40,14 @@ $(document).ready(function () {
         data: "userid",
         render: function (data, type, row) {
           return `
-            <a href="/users/edit/${data}" class="btn btn-success btn-sm mr-1">
-              <i class="fas fa-pencil-alt"></i>
-            </a>
-            <button class="btn btn-danger delete-btn ml-1 btn-sm" data-id="${data}" data-type="user">
-              <i class="fas fa-trash"></i>
-            </button>
+            <div class="action-buttons">
+              <a href="/users/edit/${data}" class="btn btn-success m-1">
+                <i class="fas fa-pencil-alt"></i>
+              </a>
+              <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="user">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           `;
         },
         orderable: false
@@ -85,12 +87,81 @@ $(document).ready(function () {
         data: "unit",
         render: function (data, type, row) {
           return `
-            <a href="/units/edit/${data}" class="btn btn-success btn-sm mr-1">
-              <i class="fas fa-pencil-alt"></i>
-            </a>
-            <button class="btn btn-danger delete-btn ml-1 btn-sm" data-id="${data}" data-type="unit">
-              <i class="fas fa-trash"></i>
-            </button>
+            <div class="action-buttons">
+              <a href="/units/edit/${data}" class="btn btn-success m-1">
+                <i class="fas fa-pencil-alt"></i>
+              </a>
+              <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="unit">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          `;
+        },
+        orderable: false
+      },
+    ],
+    createdRow: function (row, data, dataIndex) {
+      $('td', row).addClass('align-middle');
+    }
+  });
+
+  // Initialize DataTable for goods
+  $("#dataTableGoods").DataTable({
+    responsive: true,
+    searching: true,
+    lengthMenu: [3, 10, 100],
+    language: {
+      emptyTable: "No data available in table",
+      lengthMenu: "Show _MENU_ entries",
+      paginate: {
+        first: null,
+        previous: "Previous",
+        next: "Next",
+        last: null,
+      },
+      sort: "ascending",
+    },
+    sortable: true,
+    ajax: {
+      url: "/goods/api/goods",
+      dataSrc: "data",
+    },
+    columns: [
+      { data: "barcode" },
+      { data: "name" },
+      { data: "stock" },
+      { data: "unit" },
+      {
+        data: "purchaseprice",
+        render: function (data, type, row) {
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+        }
+      },
+      {
+        data: "sellingprice",
+        render: function (data, type, row) {
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+        }
+      },
+      {
+        data: "picture", render: function (data, type, row) {
+          const imageUrl = data ? data : 'asset/svg/no-image.svg';
+          return `<img src="${imageUrl}" alt="Picture" style="width: 50px; height: auto;" />`;
+        },
+        orderable: false
+      },
+      {
+        data: "barcode",
+        render: function (data, type, row) {
+          return `
+            <div class="action-buttons">
+              <a href="/goods/edit/${data}" class="btn btn-success m-1">
+                <i class="fas fa-pencil-alt"></i>
+              </a>
+              <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="goods">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           `;
         },
         orderable: false
@@ -112,7 +183,14 @@ $(document).ready(function () {
   $('#confirmDelete').on('click', function () {
     const id = $('#deleteModal').data('id');
     const type = $('#deleteModal').data('type');
-    const url = type === 'user' ? `/users/delete/${id}` : `/units/delete/${id}`;
+    let url = '';
+    if (type === 'user') {
+      url = `/users/delete/${id}`;
+    } else if (type === 'unit') {
+      url = `/units/delete/${id}`;
+    } else if (type === 'goods') {
+      url = `/goods/delete/${id}`;
+    }
 
     $.ajax({
       url: url,
@@ -121,8 +199,10 @@ $(document).ready(function () {
         $('#deleteModal').modal('hide');
         if (type === 'user') {
           $('#dataTableUser').DataTable().ajax.reload();
-        } else {
+        } else if (type === 'unit') {
           $('#dataTableUnit').DataTable().ajax.reload();
+        } else if (type === 'goods') {
+          $('#dataTableGoods').DataTable().ajax.reload();
         }
       },
       error: function (error) {

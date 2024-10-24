@@ -6,6 +6,18 @@ label {
   margin-bottom: 0;
 }
 
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 576px) {
+  .action-buttons {
+    display: inline-flex;
+  }
+}
+
 .pagination .dt-paging-button .page-link.first,
 .pagination .dt-paging-button .page-link.last {
   display: none !important;

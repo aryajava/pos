@@ -1,75 +1,74 @@
 <%- include('../partials/layoutTop') %>
 
-  <body id="page-top">
-    <!-- Page Wrapper -->
-    <div id="wrapper">
-      <!-- Sidebar -->
-      <%- include('../partials/sidebar') %>
-        <!-- End of Sidebar -->
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-          <!-- Main Content -->
-          <div id="content">
-            <!-- Topbar -->
-            <%- include('../partials/topbar') %>
-              <!-- End of Topbar -->
-              <!-- Begin Page Content -->
-              <div class="container-fluid">
-                <!-- Page Heading -->
-                <h1 class="h3 mb-2 text-gray-800">
-                  <%= titlePage %>
-                </h1>
-                <p class="mb-4">
-                  <%= description %>
-                </p>
-                <!-- DataTable -->
-                <div class="card shadow mb-4">
-                  <div class="card-header py-3">
-                    <a href="/units/add" class="btn btn-primary btn-icon-split m-0">
-                      <span class="icon text-white-50">
-                        <i class="fas fa-plus"></i>
-                      </span>
-                      <span class="text">Add</span>
-                    </a>
-                  </div>
-                  <div class="card-body">
-                    <div class="table-responsive">
-                      <table class="table table-bordered" id="dataTableUnit" width="100%"
-                        aria-describedby="dataTable_info" cellspacing="0">
-                        <thead>
-                          <tr role="row">
-                            <th class="align-content-center">Unit</th>
-                            <th class="align-content-center">Name</th>
-                            <th class="align-content-center">Note</th>
-                            <th class="align-content-center">Action</th>
-                          </tr>
-                        </thead>
-                        <tfoot>
-                          <tr>
-                            <th>Unit</th>
-                            <th>Name</th>
-                            <th>Note</th>
-                            <th>Action</th>
-                          </tr>
-                        </tfoot>
-                        <tbody>
-                          <!-- DataTables will populate this section -->
-                        </tbody>
-                      </table>
-                    </div>
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <%- include('../partials/sidebar') %>
+      <!-- End of Sidebar -->
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <%- include('../partials/topbar') %>
+            <!-- End of Topbar -->
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+              <!-- Page Heading -->
+              <h1 class="h3 mb-2 text-gray-800">
+                <%= titlePage %>
+              </h1>
+              <p class="mb-4">
+                <%= description %>
+              </p>
+              <!-- DataTable -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <a href="/units/add" class="btn btn-primary btn-icon-split m-0">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="text">Add</span>
+                  </a>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTableUnit" width="100%"
+                      aria-describedby="dataTable_info" cellspacing="0">
+                      <thead>
+                        <tr role="row">
+                          <th class="align-content-center">Unit</th>
+                          <th class="align-content-center">Name</th>
+                          <th class="align-content-center">Note</th>
+                          <th class="align-content-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tfoot>
+                        <tr>
+                          <th>Unit</th>
+                          <th>Name</th>
+                          <th>Note</th>
+                          <th>Action</th>
+                        </tr>
+                      </tfoot>
+                      <tbody>
+                        <!-- DataTables will populate this section -->
+                      </tbody>
+                    </table>
                   </div>
                 </div>
-
               </div>
-              <!-- /.container-fluid -->
-          </div>
-          <!-- End of Main Content -->
-          <!-- Footer -->
-          <%- include('../partials/footer') %>
-            <!-- End of Footer -->
+
+            </div>
+            <!-- /.container-fluid -->
         </div>
-        <!-- End of Content Wrapper -->
-    </div>
-    <!-- End of Page Wrapper -->
-    <%- include('../partials/baseScripts') %>
-      <%- include('../partials/layoutBottom') %>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <%- include('../partials/footer') %>
+          <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+  </div>
+  <!-- End of Page Wrapper -->
+  <%- include('../partials/baseScripts') %>
+    <%- include('../partials/layoutBottom') %>

@@ -15,6 +15,7 @@ import authRouter from './routes/auth.js';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import unitsRouter from './routes/units.js';
+import goodsRouter from './routes/goods.js';
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.use('/', authRouter);
 app.use('/dashboard', indexRouter);
 app.use('/users', usersRouter);
 app.use('/units', unitsRouter);
+app.use('/goods', goodsRouter);
 
 app.use(function (_, __, next) {
   next(createError(404));
