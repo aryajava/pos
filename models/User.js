@@ -16,17 +16,6 @@ export default class User {
     this.role = role;
   }
 
-  static async save(email, name, password, role) {
-    try {
-      const query = `INSERT INTO ${tableUsers} (email, name, password, role) VALUES ($1, $2, $3, $4) RETURNING *`;
-      const hashedPassword = bcrypt.hashSync(password, 10);
-      const result = await pool.query(query, [email, name, hashedPassword, role]);
-      return result.rows[0];
-    } catch (error) {
-      throw new Error(error);
-    }
-  }
-
   static async findAll() {
     try {
       const query = `SELECT * FROM users`;
@@ -51,6 +40,17 @@ export default class User {
     try {
       const query = `SELECT * FROM ${tableUsers} WHERE email = $1 LIMIT 1`;
       const result = await pool.query(query, [email]);
+      return result.rows[0];
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+
+  static async save(email, name, password, role) {
+    try {
+      const query = `INSERT INTO ${tableUsers} (email, name, password, role) VALUES ($1, $2, $3, $4) RETURNING *`;
+      const hashedPassword = bcrypt.hashSync(password, 10);
+      const result = await pool.query(query, [email, name, hashedPassword, role]);
       return result.rows[0];
     } catch (error) {
       throw new Error(error);
