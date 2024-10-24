@@ -3,6 +3,11 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 dotenv.config();
 
+const tableUsers = process.env.DB_TABLE_USER;
+if (!tableUsers) {
+  console.error('DB_TABLE_USER is not set in .env file');
+  process.exit(1);
+}
 
 export default class User {
   constructor(email, name, password, role) {
@@ -14,7 +19,7 @@ export default class User {
 
   static async save(email, name, password, role) {
     try {
-      const query = `INSERT INTO ${process.env.DB_TABLE_USER} (email, name, password, role) VALUES ($1, $2, $3, $4) RETURNING *`;
+      const query = `INSERT INTO ${tableUsers} (email, name, password, role) VALUES ($1, $2, $3, $4) RETURNING *`;
       const hashedPassword = bcrypt.hashSync(password, 10);
       const result = await pool.query(query, [email, name, hashedPassword, role]);
       return result.rows[0];
@@ -35,7 +40,7 @@ export default class User {
 
   static async findById(id) {
     try {
-      const query = `SELECT * FROM ${process.env.DB_TABLE_USER} WHERE userid = $1 LIMIT 1`;
+      const query = `SELECT * FROM ${tableUsers} WHERE userid = $1 LIMIT 1`;
       const result = await pool.query(query, [id]);
       return result.rows[0];
     } catch (error) {
@@ -45,7 +50,7 @@ export default class User {
 
   static async findByEmail(email) {
     try {
-      const query = `SELECT * FROM ${process.env.DB_TABLE_USER} WHERE email = $1 LIMIT 1`;
+      const query = `SELECT * FROM ${tableUsers} WHERE email = $1 LIMIT 1`;
       const result = await pool.query(query, [email]);
       return result.rows[0];
     } catch (error) {

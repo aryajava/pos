@@ -3,6 +3,12 @@ import dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 dotenv.config();
 
+const tableUsers = process.env.DB_TABLE_USER;
+if (!tableUsers) {
+  console.error('DB_TABLE_USER is not set in .env file');
+  process.exit(1);
+}
+
 export default class Auth {
   constructor(email, password) {
     this.email = email;
@@ -11,7 +17,7 @@ export default class Auth {
 
   async save() {
     const query = {
-      text: `INSERT INTO ${process.env.DB_TABLE_USER} (email, password) VALUES($1, $2) RETURNING *`,
+      text: `INSERT INTO ${tableUsers} (email, password) VALUES($1, $2) RETURNING *`,
       values: [this.email, bcrypt.hashSync(this.password, 10)],
     };
     try {
@@ -25,7 +31,7 @@ export default class Auth {
 
   static async findByEmail(email) {
     const query = {
-      text: `SELECT * FROM ${process.env.DB_TABLE_USER} WHERE email = $1 LIMIT 1`,
+      text: `SELECT * FROM ${tableUsers} WHERE email = $1 LIMIT 1`,
       values: [email],
     };
     try {
