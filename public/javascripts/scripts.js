@@ -10,7 +10,7 @@ $(document).ready(function () {
     hideAlert('error-alert');
   }
 
-  $("#dataTableUsers").DataTable({
+  $("#dataTableUser").DataTable({
     responsive: true,
     searching: true,
     lengthMenu: [3, 10, 100],
@@ -56,7 +56,7 @@ $(document).ready(function () {
   });
 
   // Event listener for delete button
-  $('#dataTableUsers').on('click', '.delete-btn', function () {
+  $('#dataTableUser').on('click', '.delete-btn', function () {
     const userId = $(this).data('id');
     $('#deleteModal').data('id', userId).modal('show');
   });
@@ -69,7 +69,7 @@ $(document).ready(function () {
       method: 'DELETE',
       success: function (response) {
         $('#deleteModal').modal('hide');
-        $('#dataTableUsers').DataTable().ajax.reload();
+        $('#dataTableUser').DataTable().ajax.reload();
       },
       error: function (error) {
         console.error('Error deleting user:', error);
