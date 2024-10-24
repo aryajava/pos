@@ -5,8 +5,7 @@ dotenv.config();
 
 const tableUsers = process.env.DB_TABLE_USER;
 if (!tableUsers) {
-  console.error('DB_TABLE_USER is not set in .env file');
-  process.exit(1);
+  throw new Error('DB_TABLE_USER is not set in .env file');
 }
 
 export default class User {
