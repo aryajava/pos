@@ -25,56 +25,36 @@
                       <%= titleForm %>
                     </h6>
                   </div>
-                  <form action="/users/<%= userData ? 'edit/' + userData.userid : 'add' %>" method="POST">
+                  <form action="/units/<%= unitData ? 'edit/' + unitData.unit : 'add' %>" method="POST">
                     <div class="card-body">
                       <%- include('../partials/alert') %>
                         <div class="row form-group">
-                          <div class="col-md-2 align-self-center">
-                            <label for="email">Email</label>
+                          <div class="col-md-2 align-self-top">
+                            <label for="unit">Unit</label>
                           </div>
                           <div class="col-md-10 align-self-center">
-                            <input type="email" class="form-control" id="email" name="email"
-                              value="<%= userData ? userData.email : '' %>" autocomplete="email" required>
+                            <input type="text" class="form-control" id="unit" name="unit"
+                              value="<%= unitData ? unitData.unit : '' %>" autocomplete="off" required>
                           </div>
                         </div>
                         <div class="row form-group">
-                          <div class="col-md-2 align-self-center">
+                          <div class="col-md-2 align-self-top">
                             <label for="name">Name</label>
                           </div>
                           <div class="col-md-10 align-self-center">
                             <input type="text" class="form-control" id="name" name="name"
-                              value="<%= userData ? userData.name : '' %>" autocomplete="name" required>
+                              value="<%= unitData ? unitData.name : '' %>" autocomplete="off" required>
                           </div>
                         </div>
-                        <% if (!userData) { %>
-                          <div class="row form-group">
-                            <div class="col-md-2 align-self-center">
-                              <label for="password">Password</label>
-                            </div>
-                            <div class="col-md-10 align-self-center">
-                              <input type="password" class="form-control" id="password" name="password" value=""
-                                autocomplete="new-password" required>
-                            </div>
+                        <div class="row form-group">
+                          <div class="col-md-2 align-self-top">
+                            <label for="note">Note</label>
                           </div>
-                          <% } %>
-                            <div class="row form-group">
-                              <div class="col-md-2 align-self-center">
-                                <label for="role">Role</label>
-                              </div>
-                              <div class="col-md-10 align-self-center">
-                                <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="role" id="operator"
-                                    value="operator" <%=userData && userData.role==='operator' ? 'checked' : 'checked'
-                                    %> />
-                                  <label class="form-check-label" for="operator"> Operator </label>
-                                </div>
-                                <div class="form-check">
-                                  <input class="form-check-input" type="radio" name="role" id="admin" value="admin"
-                                    <%=userData && userData.role==='admin' ? 'checked' : '' %> />
-                                  <label class="form-check-label" for="admin"> Admin </label>
-                                </div>
-                              </div>
-                            </div>
+                          <div class="col-md-10 align-self-top">
+                            <textarea class="form-control" name="note" id="note"
+                              rows="2"><%= unitData ? unitData.note : '' %></textarea>
+                          </div>
+                        </div>
                     </div>
                     <div class="card-footer">
                       <button type="submit" class="btn btn-success btn-icon-split">
@@ -83,7 +63,7 @@
                         </span>
                         <span class="text">Save</span>
                       </button>
-                      <a href="/users" class="btn btn-warning btn-icon-split">
+                      <a href="/units" class="btn btn-warning btn-icon-split">
                         <span class="icon text-white-50">
                           <i class="fas fa-undo"></i>
                         </span>

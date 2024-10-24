@@ -44,11 +44,11 @@ router.post('/add', checkSession, userFormAddValidation, async function (req, re
 router.get('/edit/:id', checkSession, async function (req, res, next) {
   const { id } = req.params;
   try {
-    if (!await User.findById(id)) {
+    const userData = await User.findById(id);
+    if (!userData) {
       req.flash('error', 'User not found');
       return res.status(404).redirect('/users');
     }
-    const userData = await User.findById(id);
     res.render('users/formUser', {
       error: req.flash("error"),
       success: req.flash("success"),

@@ -31,6 +31,7 @@ DB_NAME=your_db_name_here
 DB_USER=your_db_user_here
 DB_PASSWORD=your_db_password_here
 DB_TABLE_USER=your_db_table_user_here
+DB_TABLE_UNIT=your_db_table_unit_here
 SESSION_SECRET=your_session_secret_here
 ```
 
