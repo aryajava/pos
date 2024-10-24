@@ -1,18 +1,13 @@
 const hideAlert = (id) => {
-  setTimeout(() => {
-    const alertElement = document.getElementById(id);
-    if (alertElement) {
-      alertElement.style.display = "none";
-    }
-  }, 3000);
+  $(`#${id}`);
 };
 
 $(document).ready(function () {
-  if ($("#success-alert")) {
-    hideAlert("success-alert");
+  if ($('#success-alert').length) {
+    hideAlert('success-alert');
   }
-  if ($("#error-alert")) {
-    hideAlert("error-alert");
+  if ($('#error-alert').length) {
+    hideAlert('error-alert');
   }
 
   $("#dataTableUsers").DataTable({
