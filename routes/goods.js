@@ -103,29 +103,34 @@ router.post('/edit/:barcode', checkSession, async function (req, res, next) {
       req.flash("error", "Goods not found");
       return res.redirect('/goods');
     }
-    if (!req.files || Object.keys(req.files).length === 0) {
-      req.flash("error", "No files uploaded.");
-      res.redirect("/goods/edit/" + barcode);
-      return;
+
+    if (req.files && req.files.picture) {
+      const file = req.files.picture;
+      const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "");
+      const dir = path.join(__dirname, "../../public/asset/goods/", barcode);
+
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const fileName = `${timestamp}.jpg`;
+      const picturePath = `/${dir}/${fileName}`;
+      // Resize and convert to jpg
+      await sharp(file.data)
+        .resize(256, 256)
+        .toFormat('jpg')
+        .toFile(picturePath);
+
+      const newGoods = new Goods(barcode, name, stock, purchaseprice, sellingprice, unit, fileName);
+      console.log(`newGoods upload: `, newGoods);
+
+      await Goods.update(newGoods);
+    } else {
+      const goodsData = await Goods.findByBarcode(barcode);
+      const newGoods = new Goods(barcode, name, stock, purchaseprice, sellingprice, unit, goodsData.picture);
+      console.log(`newGoods: `, newGoods);
+
+      await Goods.update(newGoods);
     }
-    const file = req.files.picture;
-
-    const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "");
-    const dir = path.join(__dirname, "../../public/asset/goods/", barcode);
-
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const fileName = `${timestamp}.jpg`;
-    const picturePath = `/${dir}/${fileName}`;
-    // Resize and convert to jpg
-    await sharp(file.data)
-      .resize(256, 256)
-      .toFormat('jpg')
-      .toFile(picturePath);
-
-    const newGoods = new Goods(barcode, name, stock, purchaseprice, sellingprice, unit, fileName);
-    await Goods.update(newGoods);
     res.redirect('/goods');
   } catch (error) {
     console.error("Error update goods:", error);
