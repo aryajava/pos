@@ -1,22 +1,14 @@
-import { pool } from "../config/database.js";
-import dotenv from 'dotenv';
-dotenv.config();
-
-const tableUnits = process.env.DB_TABLE_UNIT;
-if (!tableUnits) {
-  throw new Error('DB_TABLE_UNIT is not set in .env file');
-}
-
 export default class Unit {
-  constructor(unit, name, note) {
+  constructor(pool, unit, name, note) {
+    this.pool = pool;
     this.unit = unit;
     this.name = name;
     this.note = note;
   }
 
-  static async findAll(searchQuery = '') {
+  static async findAll(pool, searchQuery = '') {
     try {
-      let query = `SELECT * FROM ${tableUnits}`;
+      let query = `SELECT * FROM units`;
       const params = [];
       if (searchQuery) {
         query += ` WHERE LOWER(name) LIKE LOWER($1) 
@@ -32,9 +24,9 @@ export default class Unit {
     }
   }
 
-  static async findByUnit(unit) {
+  static async findByUnit(pool, unit) {
     try {
-      const query = `SELECT * FROM ${tableUnits} WHERE unit = $1 LIMIT 1`;
+      const query = `SELECT * FROM units WHERE unit = $1 LIMIT 1`;
       const results = await pool.query(query, [unit]);
       return results.rows[0];
     } catch (error) {
@@ -43,10 +35,10 @@ export default class Unit {
     }
   }
 
-  static async save(newUnit) {
+  static async save(pool, newUnit) {
     const { unit, name, note } = newUnit;
     try {
-      const query = `INSERT INTO ${tableUnits} (unit, name, note) VALUES ($1, $2, $3) RETURNING *`;
+      const query = `INSERT INTO units (unit, name, note) VALUES ($1, $2, $3) RETURNING *`;
       const results = await pool.query(query, [unit, name, note]);
       return results.rows[0];
     } catch (error) {
@@ -55,10 +47,10 @@ export default class Unit {
     }
   }
 
-  static async update(newUnit, name, note, oldUnit) {
+  static async update(pool, newUnit, name, note, oldUnit) {
     console.log(newUnit, name, note, oldUnit);
     try {
-      const query = `UPDATE ${tableUnits} SET unit = $1, name = $2, note = $3 WHERE unit = $4 RETURNING *`;
+      const query = `UPDATE units SET unit = $1, name = $2, note = $3 WHERE unit = $4 RETURNING *`;
       const results = await pool.query(query, [newUnit, name, note, oldUnit]);
       return results.rows[0];
     } catch (error) {
@@ -67,9 +59,9 @@ export default class Unit {
     }
   }
 
-  static async delete(unit) {
+  static async delete(pool, unit) {
     try {
-      const query = `DELETE FROM ${tableUnits} WHERE unit = $1 RETURNING *`;
+      const query = `DELETE FROM units WHERE unit = $1 RETURNING *`;
       const results = await pool.query(query, [unit]);
       return results.rows[0];
     } catch (error) {

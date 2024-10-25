@@ -1,18 +1,6 @@
-import { pool } from "../config/database.js";
-import dotenv from 'dotenv';
-dotenv.config();
-
-const tableGoods = process.env.DB_TABLE_GOODS;
-const tableUnit = process.env.DB_TABLE_UNIT;
-if (!tableGoods) {
-  throw new Error('DB_TABLE_GOODS is not set in .env file');
-}
-if (!tableUnit) {
-  throw new Error('DB_TABLE_UNIT is not set in .env file');
-}
-
 export default class Goods {
-  constructor(barcode, name, stock, purchaseprice, sellingprice, unit, picture) {
+  constructor(pool, barcode, name, stock, purchaseprice, sellingprice, unit, picture) {
+    this.pool = pool;
     this.barcode = barcode;
     this.name = name;
     this.stock = stock;
@@ -22,12 +10,12 @@ export default class Goods {
     this.picture = picture || null;
   }
 
-  static async findAll() {
+  static async findAll(pool) {
     try {
       const query = `
         SELECT g.*, u.name AS unitname
-        FROM ${tableGoods} g
-        LEFT JOIN ${tableUnit} u ON g.unit = u.unit
+        FROM goods g
+        LEFT JOIN units u ON g.unit = u.unit
       `;
       const results = await pool.query(query);
       return results.rows;
@@ -37,12 +25,12 @@ export default class Goods {
     }
   }
 
-  static async findByBarcode(barcode) {
+  static async findByBarcode(pool, barcode) {
     try {
       const query = `
         SELECT g.*, u.name AS unitname
-        FROM ${tableGoods} g
-        LEFT JOIN ${tableUnit} u ON g.unit = u.unit
+        FROM goods g
+        LEFT JOIN units u ON g.unit = u.unit
         WHERE g.barcode = $1
         LIMIT 1
       `;
@@ -54,10 +42,10 @@ export default class Goods {
     }
   }
 
-  static async save(newGoods) {
+  static async save(pool, newGoods) {
     const { barcode, name, stock, purchaseprice, sellingprice, unit, picture } = newGoods;
     try {
-      const query = `INSERT INTO ${tableGoods} (barcode, name, stock, purchaseprice, sellingprice, unit, picture) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
+      const query = `INSERT INTO goods (barcode, name, stock, purchaseprice, sellingprice, unit, picture) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
       const results = await pool.query(query, [barcode, name, stock, purchaseprice, sellingprice, unit, picture]);
       return results.rows[0];
     } catch (error) {
@@ -66,10 +54,10 @@ export default class Goods {
     }
   }
 
-  static async update(newGoods) {
+  static async update(pool, newGoods) {
     const { barcode, name, stock, purchaseprice, sellingprice, unit, picture } = newGoods;
     try {
-      const query = `UPDATE ${tableGoods} SET name = $1, stock = $2, purchaseprice = $3, sellingprice = $4, unit = $5, picture = $6 WHERE barcode = $7 RETURNING *`;
+      const query = `UPDATE goods SET name = $1, stock = $2, purchaseprice = $3, sellingprice = $4, unit = $5, picture = $6 WHERE barcode = $7 RETURNING *`;
       const results = await pool.query(query, [name, stock, purchaseprice, sellingprice, unit, picture, barcode]);
       return results.rows[0];
     } catch (error) {
@@ -78,9 +66,9 @@ export default class Goods {
     }
   }
 
-  static async delete(barcode) {
+  static async delete(pool, barcode) {
     try {
-      const query = `DELETE FROM ${tableGoods} WHERE barcode = $1 RETURNING *`;
+      const query = `DELETE FROM goods WHERE barcode = $1 RETURNING *`;
       const results = await pool.query(query, [barcode]);
       return results.rows[0];
     } catch (error) {

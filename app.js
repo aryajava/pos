@@ -7,19 +7,29 @@ import flash from 'connect-flash';
 import session from 'express-session';
 import fileupload from 'express-fileupload';
 import dotenv from 'dotenv';
+import pkg from 'pg';
+const { Pool } = pkg;
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+
 dotenv.config();
-
-const __dirname = import.meta.dirname;
-
-import authRouter from './routes/auth.js';
-import indexRouter from './routes/index.js';
-import usersRouter from './routes/users.js';
-import unitsRouter from './routes/units.js';
-import goodsRouter from './routes/goods.js';
 
 const app = express();
 
-// view engine setup
+// Inisialisasi pool
+const pool = new Pool({
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  port: parseInt(process.env.DB_PORT, 10),
+});
+
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error("Error acquiring client", err.message);
+  }
+});
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -61,11 +71,19 @@ app.use(
   })
 );
 
-app.use('/', authRouter);
-app.use('/dashboard', indexRouter);
-app.use('/users', usersRouter);
-app.use('/units', unitsRouter);
-app.use('/goods', goodsRouter);
+// Pass pool to routers
+import authRouter from './routes/auth.js';
+import indexRouter from './routes/index.js';
+import usersRouter from './routes/users.js';
+import unitsRouter from './routes/units.js';
+import goodsRouter from './routes/goods.js';
+import { log } from 'console';
+
+app.use('/', authRouter(pool));
+app.use('/dashboard', indexRouter(pool));
+app.use('/users', usersRouter(pool));
+app.use('/units', unitsRouter(pool));
+app.use('/goods', goodsRouter(pool));
 
 app.use(function (_, __, next) {
   next(createError(404));
@@ -73,11 +91,8 @@ app.use(function (_, __, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
