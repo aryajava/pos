@@ -94,7 +94,8 @@ router.delete('/delete/:unit', checkSession, async function (req, res, next) {
 
 router.get('/api/units', checkSession, async function (req, res, next) {
   try {
-    const unitsData = await Unit.findAll();
+    const searchQuery = req.query.q || '';
+    const unitsData = await Unit.findAll(searchQuery);
     res.json({ data: unitsData });
   } catch (error) {
     console.error("Error fetching users data:", error);

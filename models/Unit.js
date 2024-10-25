@@ -14,10 +14,17 @@ export default class Unit {
     this.note = note;
   }
 
-  static async findAll() {
+  static async findAll(searchQuery = '') {
     try {
-      const query = `SELECT * FROM ${tableUnits}`;
-      const results = await pool.query(query);
+      let query = `SELECT * FROM ${tableUnits}`;
+      const params = [];
+      if (searchQuery) {
+        query += ` WHERE LOWER(name) LIKE LOWER($1) 
+                 OR LOWER(unit) LIKE LOWER($2) 
+                 OR LOWER(note) LIKE LOWER($3)`;
+        params.push(`%${searchQuery}%`, `%${searchQuery}%`, `%${searchQuery}%`);
+      }
+      const results = await pool.query(query, params);
       return results.rows;
     } catch (error) {
       error.message = "Error findAll: " + error.message;
