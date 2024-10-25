@@ -21,7 +21,8 @@
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "pg": "^8.13.0",
-    "select2": "^4.1.0-rc.0"
+    "select2": "^4.1.0-rc.0",
+    "sharp": "^0.33.5"
   },
   "description": "Point of Sale",
   "main": "app.js",

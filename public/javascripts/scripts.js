@@ -146,7 +146,7 @@ $(document).ready(function () {
       {
         data: "picture", render: function (data, type, row) {
           const imageUrl = data ? data : 'asset/svg/no-image.svg';
-          return `<img src="${imageUrl}" alt="Picture" style="width: 50px; height: auto;" />`;
+          return `<img src="${imageUrl}" alt="Picture" style="width: 100px; height: auto;" />`;
         },
         orderable: false
       },

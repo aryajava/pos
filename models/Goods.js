@@ -66,10 +66,11 @@ export default class Goods {
     }
   }
 
-  static async update(newGoods, name, stock, purchaseprice, sellingprice, unit, picture, oldBarcode) {
+  static async update(newGoods) {
+    const { barcode, name, stock, purchaseprice, sellingprice, unit, picture } = newGoods;
     try {
-      const query = `UPDATE ${tableGoods} SET barcode = $1, name = $2, stock = $3, purchaseprice = $4, sellingprice = $5, unit = $6, picture = $7 WHERE barcode = $8 RETURNING *`;
-      const results = await pool.query(query, [newGoods, name, stock, purchaseprice, sellingprice, unit, picture, oldBarcode]);
+      const query = `UPDATE ${tableGoods} SET name = $1, stock = $2, purchaseprice = $3, sellingprice = $4, unit = $5, picture = $6 WHERE barcode = $7 RETURNING *`;
+      const results = await pool.query(query, [name, stock, purchaseprice, sellingprice, unit, picture, barcode]);
       return results.rows[0];
     } catch (error) {
       console.error(`Error update: `, error);

@@ -24,7 +24,8 @@
                     <%= titleForm %>
                   </h6>
                 </div>
-                <form action="/goods/<%= goodsData ? 'edit/' + goodsData.unit : 'add' %>" method="POST">
+                <form action="/goods/<%= goodsData ? 'edit/' + goodsData.barcode : 'add' %>" method="POST"
+                  enctype="multipart/form-data">
                   <div class="card-body">
                     <%- include('../partials/alert') %>
                       <div class="row form-group">
@@ -33,7 +34,8 @@
                         </div>
                         <div class="col-md-10 align-self-center">
                           <input type="text" class="form-control" id="barcode" name="barcode"
-                            value="<%= goodsData ? goodsData.barcode : '' %>" autocomplete="off" required>
+                            value="<%= goodsData ? goodsData.barcode : '' %>" autocomplete="off" <%=goodsData
+                            ? "disabled" : "" %> required>
                         </div>
                       </div>
                       <div class="row form-group">
@@ -77,15 +79,23 @@
                           <label for="unit">Unit</label>
                         </div>
                         <div class="col-md-10 align-self-center">
-                          <select class="form-control" name="unit" id="unit"></select>
+                          <select class="form-control" name="unit" id="unit">
+                            <option value="<%= goodsData ? goodsData.unit : '' %>" selected>
+                              <%= goodsData ? goodsData.unit : 'Select a unit' %>
+                            </option>
+                          </select>
                         </div>
                       </div>
                       <div class="row form-group">
                         <div class="col-md-2 align-self-center">
                           <label for="imageInput">Picture</label>
                         </div>
-                        <div class="col-md-10 align-self-center">
-                          <input type="file" class="form-control-file" id="imageInput" name="picture" accept="image/*">
+                        <div class="col-md-10 align-self-center input-group">
+                          <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="imageInput" name="picture"
+                              accept="image/*">
+                            <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
+                          </div>
                         </div>
                       </div>
                       <div class="row form-group" id="previewRow" style="display: none;">
@@ -93,8 +103,8 @@
                           <label for="preview">Preview</label>
                         </div>
                         <div class="col-md-10 align-self-center">
-                          <img id="preview" src="<%= goodsData ? goodsData.picture : '' %>" alt="Image Preview"
-                            style="max-width: 100%; height: auto;">
+                          <img id="preview" src="<%= goodsData ? picturePath : '' %>" alt="Image Preview"
+                            name="preview">
                         </div>
                       </div>
                   </div>
@@ -109,7 +119,7 @@
                       <span class="icon text-white-50">
                         <i class="fas fa-undo"></i>
                       </span>
-                      <span class="text">Cancel</span>
+                      <span class="text">Back</span>
                     </a>
                   </div>
                 </form>

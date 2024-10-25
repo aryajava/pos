@@ -31,3 +31,21 @@ table.dataTable th.dt-type-numeric,
 table.dataTable td.dt-type-numeric {
   text-align: left !important;
 }
+
+/* styles.css */
+#preview {
+  max-width: 30%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  #preview {
+    max-width: 75% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #preview {
+    max-width: 100% !important;
+  }
+}
