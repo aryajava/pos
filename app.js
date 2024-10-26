@@ -71,19 +71,19 @@ app.use(
   })
 );
 
-// Pass pool to routers
 import authRouter from './routes/auth.js';
 import indexRouter from './routes/index.js';
 import usersRouter from './routes/users.js';
 import unitsRouter from './routes/units.js';
 import goodsRouter from './routes/goods.js';
-import { log } from 'console';
+import suppliersRouter from './routes/suppliers.js';
 
 app.use('/', authRouter(pool));
 app.use('/dashboard', indexRouter(pool));
 app.use('/users', usersRouter(pool));
 app.use('/units', unitsRouter(pool));
 app.use('/goods', goodsRouter(pool));
+app.use('/suppliers', suppliersRouter(pool));
 
 app.use(function (_, __, next) {
   next(createError(404));
