@@ -1,4 +1,4 @@
-# Point of Sale
+# Point of Sales (POS)
 
 > Poin of Sales Application
 
@@ -6,7 +6,7 @@ This project is Point of Sale Application. built using Express JS and EJS for te
 
 ## Table of Contents
 
-- [Point of Sale](#point-of-sale)
+- [Point of Sales](#point-of-sales)
   - [Table of Contents](#table-of-contents)
   - [Installation](#installation)
   - [Usage](#usage)
