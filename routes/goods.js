@@ -3,20 +3,18 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import { checkSession } from '../middlewares/checkSession.js';
+import { goodsFormAddValidation, goodsFormUpdateValidation } from '../middlewares/formValidation.js';
 import Goods from '../models/Goods.js';
 const router = express.Router();
 const __dirname = import.meta.url.replace('file://', '');
 
 export default (pool) => {
   router.get('/', checkSession, async (req, res, next) => {
-    // const goodsData = await Goods.findAll();
-    // const picture = goodsData && goodsData.picture ? `/asset/goods/${barcode}/${goodsData.picture}` : null;
     res.render('goods/listGoods', {
       user: req.session.user,
       title: `POS - Goods`,
       titlePage: `Goods`,
       description: `This is data of Goods`,
-      // goodsData
     });
   });
 
@@ -33,10 +31,9 @@ export default (pool) => {
     });
   });
 
-  router.post('/add', checkSession, async (req, res, next) => {
+  router.post('/add', checkSession, goodsFormAddValidation, async (req, res, next) => {
     const { barcode, name, stock, purchaseprice, sellingprice, unit } = req.body;
     try {
-      // Handle file upload
       let picture = null;
       if (req.files && req.files.picture) {
         const file = req.files.picture;
@@ -44,8 +41,6 @@ export default (pool) => {
         const timestamp = Date.now();
         const filePath = `${dir}/${timestamp}.jpg`;
         fs.mkdirSync(dir, { recursive: true });
-
-        // Resize and convert to jpg
         await sharp(file.data)
           .resize(256, 256)
           .toFormat('jpg')
@@ -53,7 +48,6 @@ export default (pool) => {
 
         picture = `${timestamp}.jpg`;
       }
-
       const newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, picture);
       if (await Goods.findByBarcode(pool, barcode)) {
         req.flash("error", "Goods already exists");
@@ -95,32 +89,27 @@ export default (pool) => {
     }
   });
 
-  router.post('/edit/:barcode', checkSession, async (req, res, next) => {
+  router.post('/edit/:barcode', checkSession, goodsFormUpdateValidation, async (req, res, next) => {
     const { barcode } = req.params;
     const { name, stock, purchaseprice, sellingprice, unit } = req.body;
-
     try {
       if (!await Goods.findByBarcode(pool, barcode)) {
         req.flash("error", "Goods not found");
         return res.redirect('/goods');
       }
-
       if (req.files && req.files.picture) {
         const file = req.files.picture;
         const timestamp = new Date().toISOString().replace(/[-T:.Z]/g, "");
         const dir = path.join(__dirname, "../../public/asset/goods/", barcode);
-
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, { recursive: true });
         }
         const fileName = `${timestamp}.jpg`;
         const picturePath = `/${dir}/${fileName}`;
-        // Resize and convert to jpg
         await sharp(file.data)
           .resize(256, 256)
           .toFormat('jpg')
           .toFile(picturePath);
-
         const newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, fileName);
         await Goods.update(pool, newGoods);
       } else {

@@ -1,6 +1,7 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
 import Supplier from '../models/Supplier.js';
+import { supplierFormAddValidation, supplierFormUpdateValidation } from '../middlewares/formValidation.js';
 const router = express.Router();
 
 export default (pool) => {
@@ -32,7 +33,7 @@ export default (pool) => {
     }
   });
 
-  router.post('/add', checkSession, async (req, res) => {
+  router.post('/add', checkSession, supplierFormAddValidation, async (req, res) => {
     try {
       const { name, address, phone } = req.body;
       const newSupplier = new Supplier(pool, name, address, phone);
@@ -66,7 +67,7 @@ export default (pool) => {
     }
   });
 
-  router.post('/edit/:id', checkSession, async (req, res) => {
+  router.post('/edit/:id', checkSession, supplierFormUpdateValidation, async (req, res) => {
     const { id } = req.params;
     const { name, address, phone } = req.body;
     try {

@@ -2,7 +2,7 @@ import express from 'express';
 import bcrypt from 'bcrypt';
 import Auth from '../models/Auth.js';
 import { checkSessionAuth } from '../middlewares/checkSession.js';
-import { authLoginValidation, authRegisterValidation } from '../middlewares/authValidation.js';
+import { authLoginValidation, authRegisterValidation } from '../middlewares/formValidation.js';
 const router = express.Router();
 
 export default (pool) => {
