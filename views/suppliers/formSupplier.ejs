@@ -1,0 +1,88 @@
+<%- include('../partials/layoutTop') %>
+
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <%- include('../partials/sidebar') %>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+          <!-- Main Content -->
+          <div id="content">
+            <!-- Topbar -->
+            <%- include('../partials/topbar') %>
+              <!-- End of Topbar -->
+              <!-- Begin Page Content -->
+              <div class="container-fluid">
+                <!-- Page Heading -->
+                <h1 class="h3 mb-2 text-gray-800">
+                  <%= titlePage %>
+                </h1>
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                      <%= titleForm %>
+                    </h6>
+                  </div>
+                  <form action="/suppliers/<%= supplierData ? 'edit/' + supplierData.supplierid : 'add' %>"
+                    method="POST">
+                    <div class="card-body">
+                      <%- include('../partials/alert') %>
+                        <div class="row form-group">
+                          <div class="col-md-2 align-self-top">
+                            <label for="name">Name</label>
+                          </div>
+                          <div class="col-md-10 align-self-center">
+                            <input type="text" class="form-control" id="name" name="name"
+                              value="<%= supplierData ? supplierData.name : '' %>" autocomplete="off" required>
+                          </div>
+                        </div>
+                        <div class="row form-group">
+                          <div class="col-md-2 align-self-top">
+                            <label for="address">Address</label>
+                          </div>
+                          <div class="col-md-10 align-self-top">
+                            <textarea class="form-control" name="address" id="address"
+                              rows="2"><%= supplierData ? supplierData.address : '' %></textarea>
+                          </div>
+                        </div>
+                        <div class="row form-group">
+                          <div class="col-md-2 align-self-top">
+                            <label for="phone">Phone</label>
+                          </div>
+                          <div class="col-md-10 align-self-center">
+                            <input type="text" class="form-control" id="phone" name="phone"
+                              value="<%= supplierData ? supplierData.phone : '' %>" autocomplete="off" required>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                      <button type="submit" class="btn btn-success btn-icon-split">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-database"></i>
+                        </span>
+                        <span class="text">Save</span>
+                      </button>
+                      <a href="/suppliers" class="btn btn-warning btn-icon-split">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-undo"></i>
+                        </span>
+                        <span class="text">Cancel</span>
+                      </a>
+                    </div>
+                  </form>
+                </div>
+              </div>
+              <!-- /.container-fluid -->
+          </div>
+          <!-- End of Main Content -->
+          <!-- Footer -->
+          <%- include('../partials/footer') %>
+            <!-- End of Footer -->
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+    <%- include('../partials/baseScripts') %>
+      <%- include('../partials/layoutBottom') %>

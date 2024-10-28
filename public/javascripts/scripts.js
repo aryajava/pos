@@ -172,6 +172,55 @@ $(document).ready(function () {
     }
   });
 
+  // Initialize DataTable for suppliers
+  $("#dataTableSupplier").DataTable({
+    responsive: true,
+    searching: true,
+    lengthMenu: [3, 10, 100],
+    language: {
+      emptyTable: "No data available in table",
+      lengthMenu: "Show _MENU_ entries",
+      paginate: {
+        first: null,
+        previous: "Previous",
+        next: "Next",
+        last: null,
+      },
+      sort: "ascending",
+    },
+    sortable: true,
+    ajax: {
+      url: "/suppliers/api/suppliers",
+      dataSrc: "data",
+    },
+    columns: [
+      { data: "supplierid" },
+      { data: "name" },
+      { data: "address" },
+      { data: "phone" },
+      {
+        data: "supplierid",
+        render: function (data, type, row) {
+          return `
+            <div class="action-buttons">
+              <a href="/suppliers/edit/${data}" class="btn btn-success m-1">
+                <i class="fas fa-pencil-alt"></i>
+              </a>
+              <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="supplier">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          `;
+        },
+        orderable: false
+      },
+    ],
+    createdRow: function (row, data, dataIndex) {
+      $('td', row).addClass('align-middle');
+    }
+  });
+
+
   // Event delegation for delete button
   $(document).on('click', '.delete-btn', function () {
     const id = $(this).data('id');
@@ -190,6 +239,8 @@ $(document).ready(function () {
       url = `/units/delete/${id}`;
     } else if (type === 'goods') {
       url = `/goods/delete/${id}`;
+    } else if (type === 'supplier') {
+      url = `/suppliers/delete/${id}`;
     }
 
     $.ajax({
@@ -203,6 +254,8 @@ $(document).ready(function () {
           $('#dataTableUnit').DataTable().ajax.reload();
         } else if (type === 'goods') {
           $('#dataTableGoods').DataTable().ajax.reload();
+        } else if (type === 'supplier') {
+          $('#dataTableSupplier').DataTable().ajax.reload();
         }
       },
       error: function (error) {
