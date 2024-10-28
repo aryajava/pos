@@ -8,7 +8,7 @@ const router = express.Router();
 const __dirname = import.meta.url.replace('file://', '');
 
 export default (pool) => {
-  router.get('/', checkSession, async function (req, res, next) {
+  router.get('/', checkSession, async (req, res, next) => {
     // const goodsData = await Goods.findAll();
     // const picture = goodsData && goodsData.picture ? `/asset/goods/${barcode}/${goodsData.picture}` : null;
     res.render('goods/listGoods', {
@@ -20,7 +20,7 @@ export default (pool) => {
     });
   });
 
-  router.get('/add', checkSession, async function (req, res, next) {
+  router.get('/add', checkSession, async (req, res, next) => {
     res.render('goods/formGoods', {
       user: req.session.user,
       error: req.flash("error"),
@@ -33,7 +33,7 @@ export default (pool) => {
     });
   });
 
-  router.post('/add', checkSession, async function (req, res, next) {
+  router.post('/add', checkSession, async (req, res, next) => {
     const { barcode, name, stock, purchaseprice, sellingprice, unit } = req.body;
     try {
       // Handle file upload
@@ -68,7 +68,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/edit/:barcode', checkSession, async function (req, res, next) {
+  router.get('/edit/:barcode', checkSession, async (req, res, next) => {
     const { barcode } = req.params;
     try {
       const goodsData = await Goods.findByBarcode(pool, barcode);
@@ -95,7 +95,7 @@ export default (pool) => {
     }
   });
 
-  router.post('/edit/:barcode', checkSession, async function (req, res, next) {
+  router.post('/edit/:barcode', checkSession, async (req, res, next) => {
     const { barcode } = req.params;
     const { name, stock, purchaseprice, sellingprice, unit } = req.body;
 
@@ -138,7 +138,7 @@ export default (pool) => {
 
   // API
 
-  router.delete('/delete/:barcode', checkSession, async function (req, res, next) {
+  router.delete('/delete/:barcode', checkSession, async (req, res, next) => {
     const { barcode } = req.params;
     try {
       await Goods.delete(pool, barcode);
@@ -153,7 +153,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/api/goods', checkSession, async function (req, res, next) {
+  router.get('/api/goods', checkSession, async (req, res, next) => {
     try {
       const goodsData = await Goods.findAll(pool);
       const updatedGoodsData = goodsData.map(good => {
