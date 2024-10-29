@@ -1,6 +1,6 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
-import { unitFormAddValidation } from '../middlewares/formValidation.js';
+import { unitFormAddValidation, unitFormUpdateValidation } from '../middlewares/formValidation.js';
 import Unit from '../models/Unit.js';
 const router = express.Router();
 
