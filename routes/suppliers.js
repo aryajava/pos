@@ -97,7 +97,8 @@ export default (pool) => {
 
   router.get('/api/suppliers', checkSession, async (req, res) => {
     try {
-      const suppliersData = await Supplier.findAll(pool);
+      const searchQuery = req.query.q || '';
+      const suppliersData = await Supplier.findAll(pool, searchQuery);
       res.json({ data: suppliersData });
     } catch (error) {
       res.status(500).json({ error: error.message });
