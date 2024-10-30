@@ -21,8 +21,6 @@ export default (pool) => {
   router.get('/add', checkSession, async (req, res, next) => {
     res.render('goods/formGoods', {
       user: req.session.user,
-      error: req.flash("error"),
-      success: req.flash("success"),
       title: `POS - Add Goods`,
       titleForm: `Form Add`,
       titlePage: `Goods`,
@@ -73,8 +71,6 @@ export default (pool) => {
       }
       res.render('goods/formGoods', {
         user: req.session.user,
-        error: req.flash("error"),
-        success: req.flash("success"),
         title: `POS - Edit Goods`,
         titleForm: `Form Edit`,
         titlePage: `Goods`,

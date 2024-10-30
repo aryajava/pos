@@ -105,11 +105,11 @@ export const goodsFormUpdateValidation = (req, res, next) => {
   const { name, stock, purchaseprice, sellingprice, unit } = req.body;
   if (!barcode || !name || !stock || !purchaseprice || !sellingprice || !unit) {
     req.flash('error', 'Please fill all fields');
-    return res.status(400).redirect(`/goods/edit/${id}`);
+    return res.status(400).redirect(`/goods/edit/${barcode}`);
   }
   if (barcode.trim() === '' || name.trim() === '' || stock.trim() === '' || purchaseprice.trim() === '' || sellingprice.trim() === '' || unit.trim() === '') {
     req.flash('error', 'Please fill all fields with valid input');
-    return res.status(400).redirect(`/goods/edit/${id}`);
+    return res.status(400).redirect(`/goods/edit/${barcode}`);
   }
 
   return next();
