@@ -23,7 +23,7 @@ export default (pool) => {
         title: 'POS - Suppliers',
         titlePage: 'Supplier',
         titleForm: `Form Add`,
-        description: 'Add a new supplier',
+        description: `This is Add Supplier Page`,
         supplierData: null,
       });
     } catch (error) {
