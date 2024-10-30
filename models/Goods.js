@@ -10,14 +10,19 @@ export default class Goods {
     this.picture = picture || null;
   }
 
-  static async findAll(pool) {
+  static async findAll(pool, searchQuery = '') {
     try {
-      const query = `
+      let query = `
         SELECT g.*, u.name AS unitname
         FROM goods g
-        LEFT JOIN units u ON g.unit = u.unit
-      `;
-      const results = await pool.query(query);
+        LEFT JOIN units u ON g.unit = u.unit`;
+      const params = [];
+      if (searchQuery) {
+        query += ` WHERE g.name ILIKE $1
+                   OR g.barcode ILIKE $2`;
+        params.push(`%${searchQuery}%`, `%${searchQuery}%`,);
+      }
+      const results = await pool.query(query, params);
       return results.rows;
     } catch (error) {
       error.message = "Error findAll: " + error.message;

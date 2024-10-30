@@ -6,13 +6,17 @@ export default class Supplier {
     this.phone = phone;
   }
 
-  static async findAll(pool) {
+  static async findAll(pool, searchQuery = '') {
     try {
-      const query = `SELECT * FROM suppliers`;
-      const results = await pool.query(query);
+      let query = `SELECT * FROM suppliers`;
+      const params = [];
+      if (searchQuery) {
+        query += ` WHERE LOWER(name) LIKE LOWER($1)`;
+        params.push(`%${searchQuery}%`);
+      }
+      const results = await pool.query(query, params);
       return results.rows;
-    }
-    catch (error) {
+    } catch (error) {
       error.message = "Error findAll: " + error.message;
       throw error;
     }

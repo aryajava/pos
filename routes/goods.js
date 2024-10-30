@@ -139,8 +139,9 @@ export default (pool) => {
   });
 
   router.get('/api/goods', checkSession, async (req, res, next) => {
+    const searchQuery = req.query.q || '';
     try {
-      const goodsData = await Goods.findAll(pool);
+      const goodsData = await Goods.findAll(pool, searchQuery);
       const updatedGoodsData = goodsData.map(good => {
         return {
           ...good,
