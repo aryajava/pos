@@ -1,7 +1,6 @@
 const hideAlert = (id) => {
   $(`#${id}`);
 };
-
 $(document).ready(function () {
   if ($('#success-alert').length) {
     hideAlert('success-alert');
@@ -220,6 +219,58 @@ $(document).ready(function () {
     }
   });
 
+  // Initialize DataTable for purchases
+  $("#dataTablePurchase").DataTable({
+    responsive: true,
+    searching: true,
+    lengthMenu: [3, 10, 100],
+    language: {
+      emptyTable: "No data available in table",
+      lengthMenu: "Show _MENU_ entries",
+      paginate: {
+        first: null,
+        previous: "Previous",
+        next: "Next",
+        last: null,
+      },
+      sort: "ascending",
+    },
+    sortable: true,
+    ajax: {
+      url: "/purchases/api/purchases",
+      dataSrc: "data",
+    },
+    columns: [
+      { data: "invoice" },
+      { data: "time" },
+      {
+        data: "totalsum",
+        render: function (data, type, row) {
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+        }
+      },
+      { data: "suppliername" },
+      {
+        data: "invoice",
+        render: function (data, type, row) {
+          return `
+              <div class="action-buttons">
+                <a href="/purchases/edit/${data}" class="btn btn-success m-1">
+                  <i class="fas fa-pencil-alt"></i>
+                </a>
+                <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="purchase">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            `;
+        },
+        orderable: false
+      },
+    ],
+    createdRow: function (row, data, dataIndex) {
+      $('td', row).addClass('align-middle');
+    }
+  });
 
   // Event delegation for delete button
   $(document).on('click', '.delete-btn', function () {
@@ -241,27 +292,32 @@ $(document).ready(function () {
       url = `/goods/delete/${id}`;
     } else if (type === 'supplier') {
       url = `/suppliers/delete/${id}`;
+    } else if (type === 'purchase') {
+      url = `/purchases/api/purchase/${id}`;
     }
-
-    $.ajax({
-      url: url,
-      method: 'DELETE',
-      success: function (response) {
-        $('#deleteModal').modal('hide');
-        if (type === 'user') {
-          $('#dataTableUser').DataTable().ajax.reload();
-        } else if (type === 'unit') {
-          $('#dataTableUnit').DataTable().ajax.reload();
-        } else if (type === 'goods') {
-          $('#dataTableGoods').DataTable().ajax.reload();
-        } else if (type === 'supplier') {
-          $('#dataTableSupplier').DataTable().ajax.reload();
+    if (url) {
+      $.ajax({
+        url: url,
+        method: 'DELETE',
+        success: function (response) {
+          $('#deleteModal').modal('hide');
+          if (type === 'user') {
+            $('#dataTableUser').DataTable().ajax.reload();
+          } else if (type === 'unit') {
+            $('#dataTableUnit').DataTable().ajax.reload();
+          } else if (type === 'goods') {
+            $('#dataTableGoods').DataTable().ajax.reload();
+          } else if (type === 'supplier') {
+            $('#dataTableSupplier').DataTable().ajax.reload();
+          } else if (type === 'purchase') {
+            $('#dataTablePurchase').DataTable().ajax.reload();
+          }
+        },
+        error: function (error) {
+          console.error(`Error deleting ${type}:`, error);
+          $('#deleteModal').modal('hide');
         }
-      },
-      error: function (error) {
-        console.error(`Error deleting ${type}:`, error);
-        $('#deleteModal').modal('hide');
-      }
-    });
+      });
+    }
   });
 });

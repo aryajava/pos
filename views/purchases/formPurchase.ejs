@@ -1,0 +1,420 @@
+<%- include('../partials/layoutTop') %>
+
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <%- include('../partials/sidebar') %>
+        <!-- End of Sidebar -->
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+          <!-- Main Content -->
+          <div id="content">
+            <!-- Topbar -->
+            <%- include('../partials/topbar') %>
+              <!-- End of Topbar -->
+              <!-- Begin Page Content -->
+              <div class="container-fluid">
+                <!-- Page Heading -->
+                <h1 class="h3 mb-2 text-gray-800">
+                  <%= titlePage %>
+                </h1>
+                <div class="card shadow mb-4">
+                  <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                      <%= titleForm %>
+                    </h6>
+                  </div>
+                  <%- include('../partials/alert') %>
+                    <div class="card-body">
+                      <div class="row form-group">
+                        <div class="col-md-4 align-self-center">
+                          <label for="invoice">Invoice</label>
+                          <input type="text" class="form-control" id="invoice" name="invoice"
+                            value="<%= purchaseData ? purchaseData.invoice : '' %>" autocomplete="off" required
+                            readonly>
+                        </div>
+                        <div class="col-md-4 align-self-center">
+                          <label for="timePurchase">Time</label>
+                          <input type="text" class="form-control" id="timePurchase" name="time"
+                            value="<%= purchaseData ? purchaseData.time : '' %>" autocomplete="off" required readonly>
+                        </div>
+                        <div class="col-md-4 align-self-center">
+                          <label for="operator">Operator</label>
+                          <input type="text" class="form-control" id="operator" name="operator"
+                            value="<%= purchaseData ? purchaseData.operatorname : '' %>" autocomplete="off" required
+                            readonly>
+                        </div>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="card-body">
+                      <div id="formAddItemPurchase">
+                        <div class="row form-group">
+                          <div class="col-md-4 align-self-center">
+                            <label for="goodsBarcode">Goods Barcode</label>
+                            <select class="form-control" name="itemcode" id="goodsBarcode"></select>
+                          </div>
+                          <div class="col-md-4 align-self-center">
+                            <label for="goodsName">Goods Name</label>
+                            <input type="text" class="form-control" id="goodsName" name="goodsName" autocomplete="off"
+                              required readonly>
+                          </div>
+                          <div class="col-md-4 align-self-center">
+                            <label for="goodsStock">Stock</label>
+                            <input type="text" class="form-control" id="goodsStock" name="goodsStock" autocomplete="off"
+                              required readonly>
+                          </div>
+                        </div>
+                        <div class="row form-group">
+                          <div class="col-md-4 align-self-center">
+                            <label for="goodsPurchasePrice">Purchase Price</label>
+                            <input type="number" class="form-control" id="goodsPurchasePrice" name="goodsPurchasePrice"
+                              autocomplete="off" required>
+                          </div>
+                          <div class="col-md-4 align-self-center">
+                            <label for="quantity">Qty</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity" autocomplete="off"
+                              min="1" required>
+                          </div>
+                          <div class="col-md-4 align-self-center">
+                            <label for="totalPrice">Total Price</label>
+                            <input type="text" class="form-control" id="totalPrice" name="totalPrice" autocomplete="off"
+                              min="1" required>
+                          </div>
+                        </div>
+                        <button class="btn btn-primary btn-icon-split" id="btnAddItemPurchase">
+                          <span class="icon text-white-50">
+                            <i class="fas fa-plus"></i>
+                          </span>
+                          <span class="text">Add Item</span>
+                        </button>
+                      </div>
+                    </div>
+                    <hr>
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="dataTablePurchaseItems" width="100%"
+                        aria-describedby="dataTable_info" cellspacing="0">
+                        <thead class="custom-thead">
+                          <tr role="row">
+                            <th class="align-content-center">No.</th>
+                            <th class="align-content-center">Barcode</th>
+                            <th class="align-content-center">Name</th>
+                            <th class="align-content-center">Qty</th>
+                            <th class="align-content-center">Price</th>
+                            <th class="align-content-center">Total Price</th>
+                            <% if (isEdit) { %>
+                              <th class="align-content-center d-flex justify-content-center">Action</th>
+                              <% } %>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- DataTables will populate this section -->
+                        </tbody>
+                      </table>
+                    </div>
+                    <hr>
+                    <div class="card-footer">
+                      <div id="formPurchase">
+                        <div class="row form-group">
+                          <div class="col-md-2 align-self-center">
+                            <label for="totalsum">Total Summary</label>
+                          </div>
+                          <div class="col-md-10 align-self-center">
+                            <input type="text" class="form-control" id="totalsum" name="totalsum"
+                              value="<%= purchaseData ? purchaseData.totalsum : '' %>" autocomplete="off" required
+                              readonly>
+                          </div>
+                        </div>
+                        <div class="row form-group">
+                          <div class="col-md-2 align-self-center">
+                            <label for="supplier">Supplier</label>
+                          </div>
+                          <div class="col-md-10 align-self-center">
+                            <select class="form-control" name="supplier" id="supplier">
+                              <option value="<%= purchaseData ? purchaseData.supplier : '' %>" selected>
+                                <%= purchaseData ? purchaseData.suppliername : 'Select a supplier' %>
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <button class="btn btn-success btn-icon-split" id="btnFinishPurchase">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-database"></i>
+                        </span>
+                        <span class="text">Finish</span>
+                      </button>
+                      <a href="/purchases" class="btn btn-warning btn-icon-split">
+                        <span class="icon text-white-50">
+                          <i class="fas fa-undo"></i>
+                        </span>
+                        <span class="text">Back</span>
+                      </a>
+                    </div>
+                </div>
+              </div>
+              <!-- /.container-fluid -->
+          </div>
+          <!-- End of Main Content -->
+          <!-- Footer -->
+          <%- include('../partials/footer') %>
+            <!-- End of Footer -->
+        </div>
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
+    <%- include('../partials/baseScripts') %>
+      <script>
+        let totalPrice = 0;
+        const isEdit = `<%= typeof purchaseData !== 'undefined' %>`;
+        let itemToDelete = null;
+
+        const calculateTotalPrice = () => {
+          const quantity = parseFloat($('#quantity').val()) || 0;
+          const purchasePrice = parseFloat($('#goodsPurchasePrice').val()) || 0;
+          totalPrice = quantity * purchasePrice;
+          const formattedTotalPrice = totalPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+          $('#totalPrice').val(formattedTotalPrice);
+        };
+
+        const formatTotalSum = () => {
+          const invoice = $("#invoice").val();
+          $.ajax({
+            url: '/purchases/api/purchase/' + invoice,
+            type: 'GET',
+            success: function (data) {
+              $('#totalsum').val(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.data.totalsum));
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            }
+          });
+        };
+
+        $(document).ready(function () {
+          const invoice = $("#invoice").val();
+
+          // Initialize DataTable for purchaseItems
+          $("#dataTablePurchaseItems").DataTable({
+            responsive: true,
+            layout: {
+              topStart: null,
+              topEnd: null,
+              bottomStart: null,
+              bottomEnd: null,
+              bottom: null,
+            },
+            ordering: false,
+            language: {
+              emptyTable: "No data available in table",
+            },
+            ajax: {
+              url: "/purchases/api/purchase/" + invoice + "/items",
+              dataSrc: "data",
+            },
+            columns: [
+              {
+                data: null,
+                render: function (data, type, row, meta) {
+                  return meta.row + 1;
+                }
+              },
+              { data: "itemcode" },
+              { data: "itemname" },
+              { data: "quantity" },
+              {
+                data: "purchaseprice",
+                render: function (data, type, row) {
+                  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+                }
+              },
+              {
+                data: "totalprice",
+                render: function (data, type, row) {
+                  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+                }
+              },
+            <% if(isEdit) { %>
+            {
+              data: "id",
+              render: function (data, type, row) {
+                return `<button class="btn btn-danger btn-sm btn-delete-item" data-id="${data}" data-type="purchaseitem"><i class="fas fa-trash"></i></button>`;
+              }
+            }
+              <% } %>
+          ],
+            createdRow: function (row, data, dataIndex) {
+              $('td', row).addClass('align-middle');
+            <% if (isEdit) { %>
+                $('td:eq(6)', row).addClass('d-flex justify-content-center');
+            <% } %>
+          }
+        });
+
+        $('#goodsBarcode').select2({
+          placeholder: "Select a item",
+          allowClear: true,
+          theme: 'bootstrap4',
+          ajax: {
+            url: '/goods/api/goods',
+            dataType: 'json',
+            data: function (params) {
+              return {
+                q: params.term
+              };
+            },
+            processResults: function (data) {
+              return {
+                results: data.data.map(function (item) {
+                  return {
+                    id: item.barcode,
+                    text: `${item.barcode} - ${item.name}`,
+                  };
+                })
+              };
+            },
+            cache: false
+          },
+        }).on('select2:select', function (e) {
+          const selectedBarcode = e.params.data.id;
+          $.ajax({
+            url: '/goods/api/goods/' + selectedBarcode,
+            type: 'GET',
+            success: function (data) {
+              $('#goodsName').val(data.data.name);
+              $('#goodsStock').val(data.data.stock);
+              $('#goodsPurchasePrice').val(data.data.purchaseprice);
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            }
+          });
+        });
+
+        $('#supplier').select2({
+          placeholder: "Select a unit",
+          allowClear: true,
+          theme: 'bootstrap4',
+          ajax: {
+            url: '/suppliers/api/suppliers',
+            dataType: 'json',
+            data: function (params) {
+              return {
+                q: params.term
+              };
+            },
+            processResults: function (data) {
+              return {
+                results: data.data.map(function (item) {
+                  return {
+                    id: item.supplierid,
+                    text: item.name
+                  };
+                })
+              };
+            },
+            cache: false
+          },
+        });
+
+        $('#quantity, #goodsPurchasePrice').on('input', function () {
+          calculateTotalPrice();
+        });
+
+        $('#btnAddItemPurchase').on('click', function (e) {
+          e.preventDefault();
+          const itemcode = $('#goodsBarcode').val();
+          const itemname = $('#goodsName').val();
+          const quantity = $('#quantity').val();
+          const totalprice = totalPrice;
+          const purchaseprice = $('#goodsPurchasePrice').val();
+          $.ajax({
+            url: '/purchases/api/purchase/' + invoice + '/item',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ invoice, itemcode, quantity, purchaseprice, totalprice }),
+            success: function (response) {
+              $('#dataTablePurchaseItems').DataTable().ajax.reload();
+              $('#goodsBarcode').val(null).trigger('change');
+              $('#goodsName').val('');
+              $('#goodsStock').val('');
+              $('#goodsPurchasePrice').val('');
+              $('#quantity').val('');
+              $('#totalPrice').val('');
+              totalPrice = 0;
+              formatTotalSum();
+            },
+            error: function (xhr, status, error) {
+              const response = xhr.responseJSON;
+              if (response && response.redirect) {
+                window.location.href = response.redirect;
+              } else {
+                console.error(xhr.statusText);
+              }
+            }
+          });
+        });
+
+        $('#btnFinishPurchase').on('click', function (e) {
+          e.preventDefault();
+          const supplier = $('#supplier').val();
+          $.ajax({
+            url: '/purchases/api/purchase/' + invoice,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ invoice, supplier }),
+            success: function (response) {
+              window.location.href = '/purchases';
+            },
+            error: function (xhr, status, error) {
+              const response = xhr.responseJSON;
+              if (response && response.redirect) {
+                window.location.href = response.redirect;
+              } else {
+                console.error(xhr.statusText);
+              }
+            }
+          });
+        });
+
+        // Event listener for delete button
+        $('#dataTablePurchaseItems').on('click', '.btn-delete-item', function () {
+          const id = $(this).data('id');
+          const type = $(this).data('type');
+          $('#deleteModal').data('id', id).data('type', type).modal('show');
+        });
+
+        // Event listener for confirm delete button in modal
+        $('#confirmDelete').on('click', function () {
+          const id = $('#deleteModal').data('id');
+          const type = $('#deleteModal').data('type');
+          if (type === 'purchaseitem') {
+            $.ajax({
+              url: '/purchases/api/purchase/' + invoice + '/item/' + id,
+              method: 'DELETE',
+              success: function (response) {
+                $('#dataTablePurchaseItems').DataTable().ajax.reload();
+                $('#goodsBarcode').val(null).trigger('change');
+                $('#goodsName').val('');
+                $('#goodsStock').val('');
+                $('#goodsPurchasePrice').val('');
+                $('#quantity').val('');
+                $('#totalPrice').val('');
+                $('#deleteModal').modal('hide');
+                formatTotalSum();
+              },
+              error: function (error) {
+                console.error(`Error deleting ${type}:`, error);
+                $('#deleteModal').modal('hide');
+              }
+            });
+          }
+
+        });
+
+        formatTotalSum();
+      });
+      </script>
+
+      <%- include('../partials/layoutBottom') %>

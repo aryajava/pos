@@ -151,9 +151,10 @@ export const purchaseFormValidation = (req, res, next) => {
   const { supplier } = req.body;
   try {
     if (!supplier || supplier.trim() === '') {
+      req.flash('error', 'Please fill all fields');
       return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/purchases/edit/${invoice}` });
     }
-    next();
+    return next();
   } catch (error) {
     res.status(400).json({ success: false, message: error });
   }
@@ -162,14 +163,17 @@ export const purchaseFormValidation = (req, res, next) => {
 // PurchaseItem
 
 export const purchaseItemFormValidation = (req, res, next) => {
-  const { invoice, itemcode, quantity, purchaseprice, totalprice } = req.body;
+  let { invoice, itemcode, quantity, purchaseprice, totalprice } = req.body;
+  quantity = parseInt(quantity);
+  purchaseprice = parseInt(purchaseprice);
+  totalprice = parseInt(totalprice);
   if (!invoice || !itemcode || !quantity || !purchaseprice || !totalprice) {
-    return req.flash('error', 'Please fill all fields');
-    // return res.status(400).json({ success: false, message: 'Please fill all fields' });
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/purchases/edit/${invoice}` });
   }
-  if (invoice.trim() === '' || itemcode.trim() === '' || quantity.trim() === '' || purchaseprice.trim() === '' || totalprice.trim() === '') {
-    return req.flash('error', 'Please fill all fields with valid input');
-    // return res.status(400).json({ success: false, message: 'Please fill all fields with valid input' });
+  if (invoice.trim() === '' || itemcode.trim() === '' || purchaseprice < 1 || quantity < 1 || totalprice < 1) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/purchases/edit/${invoice}` });
   }
   return next();
 };
