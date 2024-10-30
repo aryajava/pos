@@ -20,8 +20,6 @@ export default (pool) => {
     try {
       res.render('suppliers/formSupplier', {
         user: req.session.user,
-        error: req.flash("error"),
-        success: req.flash("success"),
         title: 'POS - Suppliers',
         titlePage: 'Supplier',
         titleForm: `Form Add`,
@@ -54,8 +52,6 @@ export default (pool) => {
       }
       res.render('suppliers/formSupplier', {
         user: req.session.user,
-        error: req.flash("error"),
-        success: req.flash("success"),
         title: 'POS - Suppliers',
         titlePage: 'Supplier',
         titleForm: `Form Edit`,
