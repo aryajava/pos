@@ -72,14 +72,14 @@ export const unitFormAddValidation = (req, res, next) => {
 
 export const unitFormUpdateValidation = (req, res, next) => {
   const { unit, name } = req.body;
-  const { id } = req.params;
+  const { oldUnit } = req.params;
   if (!unit || !name) {
     req.flash('error', 'Please fill all fields');
-    return res.status(400).redirect(`/units/edit/${id}`);
+    return res.status(400).redirect(`/units/edit/${oldUnit}`);
   }
   if (unit.trim() === '' || name.trim() === '') {
     req.flash('error', 'Please fill all fields with valid input');
-    return res.status(400).redirect(`/units/edit/${id}`);
+    return res.status(400).redirect(`/units/edit/${oldUnit}`);
   }
 
   return next();
@@ -140,6 +140,36 @@ export const supplierFormUpdateValidation = (req, res, next) => {
   if (name.trim() === '' || address.trim() === '' || phone.trim() === '') {
     req.flash('error', 'Please fill all fields with valid input');
     return res.status(400).redirect(`/suppliers/edit/${id}`);
+  }
+  return next();
+};
+
+// Purchase
+
+export const purchaseFormValidation = (req, res, next) => {
+  const { invoice } = req.params;
+  const { supplier } = req.body;
+  try {
+    if (!supplier || supplier.trim() === '') {
+      return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/purchases/edit/${invoice}` });
+    }
+    next();
+  } catch (error) {
+    res.status(400).json({ success: false, message: error });
+  }
+};
+
+// PurchaseItem
+
+export const purchaseItemFormValidation = (req, res, next) => {
+  const { invoice, itemcode, quantity, purchaseprice, totalprice } = req.body;
+  if (!invoice || !itemcode || !quantity || !purchaseprice || !totalprice) {
+    return req.flash('error', 'Please fill all fields');
+    // return res.status(400).json({ success: false, message: 'Please fill all fields' });
+  }
+  if (invoice.trim() === '' || itemcode.trim() === '' || quantity.trim() === '' || purchaseprice.trim() === '' || totalprice.trim() === '') {
+    return req.flash('error', 'Please fill all fields with valid input');
+    // return res.status(400).json({ success: false, message: 'Please fill all fields with valid input' });
   }
   return next();
 };

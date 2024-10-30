@@ -19,8 +19,6 @@ export default (pool) => {
   router.get('/add', checkSession, async function (req, res, next) {
     res.render('units/formUnit', {
       user: req.session.user,
-      error: req.flash("error"),
-      success: req.flash("success"),
       title: `POS - Units`,
       titlePage: `Units`,
       titleForm: `Form Add`,
@@ -55,8 +53,6 @@ export default (pool) => {
       }
       res.render('units/formUnit', {
         user: req.session.user,
-        error: req.flash("error"),
-        success: req.flash("success"),
         title: `POS - Units`,
         titlePage: `Units`,
         titleForm: `Form Edit`,
