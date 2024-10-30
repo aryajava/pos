@@ -23,7 +23,9 @@ export default (pool) => {
     const operator = req.session.user.userid;
     const newPurchase = new Purchase(pool, null, operator);
     try {
-      const purchaseData = await Purchase.create(newPurchase);
+      const createdPurchase = await Purchase.create(newPurchase);
+      const purchaseData = await Purchase.findbyInvoice({ pool, invoice: createdPurchase.invoice });
+
       res.render('purchases/formPurchase', {
         user: req.session.user,
         title: 'POS - Add Purchases',
@@ -31,7 +33,7 @@ export default (pool) => {
         titleForm: 'Transaction',
         description: 'This is form to add Purchases',
         isEdit: false,
-        purchaseData,
+        purchaseData: { ...purchaseData, time: moment(purchaseData.time).format('DD MMM YYYY HH:mm:ss') },
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
