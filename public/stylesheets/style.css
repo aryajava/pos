@@ -32,6 +32,26 @@ table.dataTable td.dt-type-numeric {
   text-align: left !important;
 }
 
+.custom-thead {
+  border-left: none !important;
+  border-right: none !important;
+  border-top: .12rem solid #dee2e6 !important;
+  border-bottom: .12rem solid #dee2e6 !important;
+}
+
+#dataTablePurchaseItems.table-bordered {
+  border: none !important;
+}
+
+#dataTablePurchaseItems.table-bordered td,
+#dataTablePurchaseItems.table-bordered th {
+  border: none !important;
+}
+
+#dataTablePurchaseItems_wrapper>div>div {
+  padding: 0;
+}
+
 /* styles.css */
 #preview {
   max-width: 30%;
