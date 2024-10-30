@@ -177,3 +177,32 @@ export const purchaseItemFormValidation = (req, res, next) => {
   }
   return next();
 };
+
+// Customer
+
+export const customerFormAddValidation = (req, res, next) => {
+  const { name, address, phone } = req.body;
+  if (!name || !address || !phone) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).redirect(`/customers/add`);
+  }
+  if (name.trim() === '' || address.trim() === '' || phone.trim() === '') {
+    req.flash('error', 'Please fill all fields with valid input');
+    return res.status(400).redirect(`/customers/add`);
+  }
+  return next();
+};
+
+export const customerFormUpdateValidation = (req, res, next) => {
+  const { name, address, phone } = req.body;
+  const { id } = req.params;
+  if (!name || !address || !phone) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).redirect(`/customers/edit/${id}`);
+  }
+  if (name.trim() === '' || address.trim() === '' || phone.trim() === '') {
+    req.flash('error', 'Please fill all fields with valid input');
+    return res.status(400).redirect(`/customers/edit/${id}`);
+  }
+  return next();
+};
