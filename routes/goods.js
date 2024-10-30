@@ -158,5 +158,16 @@ export default (pool) => {
     }
   });
 
+  router.get('/api/goods/:barcode', checkSession, async (req, res, next) => {
+    const { barcode } = req.params;
+    try {
+      const goodsData = await Goods.findByBarcode(pool, barcode);
+      res.json({ data: goodsData });
+    } catch (error) {
+      console.error("Error get goods:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
+  });
+
   return router;
 }
