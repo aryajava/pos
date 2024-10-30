@@ -101,8 +101,8 @@ export const goodsFormAddValidation = (req, res, next) => {
 };
 
 export const goodsFormUpdateValidation = (req, res, next) => {
-  const { barcode, name, stock, purchaseprice, sellingprice, unit } = req.body;
-  const { id } = req.params;
+  const { barcode } = req.params;
+  const { name, stock, purchaseprice, sellingprice, unit } = req.body;
   if (!barcode || !name || !stock || !purchaseprice || !sellingprice || !unit) {
     req.flash('error', 'Please fill all fields');
     return res.status(400).redirect(`/goods/edit/${id}`);
@@ -111,6 +111,7 @@ export const goodsFormUpdateValidation = (req, res, next) => {
     req.flash('error', 'Please fill all fields with valid input');
     return res.status(400).redirect(`/goods/edit/${id}`);
   }
+
   return next();
 };
 
