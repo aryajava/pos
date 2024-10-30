@@ -19,8 +19,6 @@ export default (pool) => {
 
   router.get('/add', checkSession, function (req, res, next) {
     res.render('users/formUser', {
-      error: req.flash("error"),
-      success: req.flash("success"),
       title: `POS - Users`,
       titlePage: `Users`,
       titleForm: `Form Add`,
@@ -53,8 +51,6 @@ export default (pool) => {
         return res.status(404).redirect('/users');
       }
       res.render('users/formUser', {
-        error: req.flash("error"),
-        success: req.flash("success"),
         title: `POS - Users`,
         titlePage: `Users`,
         titleForm: `Form Edit`,

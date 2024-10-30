@@ -65,6 +65,12 @@ app.use(
 );
 
 app.use(flash());
+app.use((req, res, next) => {
+  res.locals.success_messages = req.flash('success');
+  res.locals.error_messages = req.flash('error');
+  next();
+});
+
 app.use(
   fileupload({
     createParentPath: true,
@@ -77,6 +83,7 @@ import usersRouter from './routes/users.js';
 import unitsRouter from './routes/units.js';
 import goodsRouter from './routes/goods.js';
 import suppliersRouter from './routes/suppliers.js';
+import purchasesRouter from './routes/purchases.js';
 
 app.use('/', authRouter(pool));
 app.use('/dashboard', indexRouter(pool));
@@ -84,6 +91,7 @@ app.use('/users', usersRouter(pool));
 app.use('/units', unitsRouter(pool));
 app.use('/goods', goodsRouter(pool));
 app.use('/suppliers', suppliersRouter(pool));
+app.use('/purchases', purchasesRouter(pool));
 
 app.use(function (_, __, next) {
   next(createError(404));
