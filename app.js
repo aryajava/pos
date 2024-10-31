@@ -85,6 +85,7 @@ import goodsRouter from './routes/goods.js';
 import suppliersRouter from './routes/suppliers.js';
 import purchasesRouter from './routes/purchases.js';
 import customersRouter from './routes/customers.js';
+import salesRouter from './routes/sales.js';
 
 app.use('/', authRouter(pool));
 app.use('/dashboard', indexRouter(pool));
@@ -94,6 +95,7 @@ app.use('/goods', goodsRouter(pool));
 app.use('/suppliers', suppliersRouter(pool));
 app.use('/purchases', purchasesRouter(pool));
 app.use('/customers', customersRouter(pool));
+app.use('/sales', salesRouter(pool));
 
 app.use(function (_, __, next) {
   next(createError(404));
