@@ -55,10 +55,10 @@ export default class Sale {
   };
 
   static async update(pool, invoice, saleData) {
-    const { customer } = saleData;
+    const { pay, change, customer } = saleData;
     try {
-      const query = `UPDATE sales SET customer = $1 WHERE invoice = $2 RETURNING *`;
-      const result = await pool.query(query, [customer, invoice]);
+      const query = `UPDATE sales SET pay = $1, change = $2, customer = $3 WHERE invoice = $4 RETURNING *`;
+      const result = await pool.query(query, [pay, change, customer, invoice]);
       return result.rows[0];
     } catch (error) {
       error.message = "Error update sale: " + error.message;
