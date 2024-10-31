@@ -39,16 +39,20 @@ table.dataTable td.dt-type-numeric {
   border-bottom: .12rem solid #dee2e6 !important;
 }
 
-#dataTablePurchaseItems.table-bordered {
+#dataTablePurchaseItems.table-bordered,
+#dataTableSaleItems.table-bordered {
   border: none !important;
 }
 
 #dataTablePurchaseItems.table-bordered td,
-#dataTablePurchaseItems.table-bordered th {
+#dataTablePurchaseItems.table-bordered th,
+#dataTableSaleItems.table-bordered td,
+#dataTableSaleItems.table-bordered th {
   border: none !important;
 }
 
-#dataTablePurchaseItems_wrapper>div>div {
+#dataTablePurchaseItems_wrapper>div>div,
+#dataTableSaleItems_wrapper>div>div {
   padding: 0;
 }
 
