@@ -51,23 +51,23 @@
                         <div class="row form-group">
                           <div class="col-md-4 align-self-center">
                             <label for="goodsBarcode">Goods Barcode</label>
-                            <select class="form-control" name="itemcode" id="goodsBarcode"></select>
+                            <select class="form-control" name="itemcode" id="goodsBarcode" autofocus></select>
                           </div>
                           <div class="col-md-4 align-self-center">
                             <label for="goodsName">Goods Name</label>
                             <input type="text" class="form-control" id="goodsName" name="goodsName" autocomplete="off"
-                              required readonly>
+                              required readonly disabled>
                           </div>
                           <div class="col-md-4 align-self-center">
                             <label for="goodsStock">Stock</label>
                             <input type="text" class="form-control" id="goodsStock" name="goodsStock" autocomplete="off"
-                              required readonly>
+                              required readonly disabled>
                           </div>
                         </div>
                         <div class="row form-group">
                           <div class="col-md-4 align-self-center">
-                            <label for="goodsPurchasePrice">Purchase Price</label>
-                            <input type="number" class="form-control" id="goodsPurchasePrice" name="goodsPurchasePrice"
+                            <label for="goodsSellingPrice">Selling Price</label>
+                            <input type="number" class="form-control" id="goodsSellingPrice" name="goodsSellingPrice"
                               autocomplete="off" required>
                           </div>
                           <div class="col-md-4 align-self-center">
@@ -91,7 +91,7 @@
                     </div>
                     <hr>
                     <div class="table-responsive">
-                      <table class="table table-bordered" id="dataTablePurchaseItems" width="100%"
+                      <table class="table table-bordered" id="dataTableSaleItems" width="100%"
                         aria-describedby="dataTable_info" cellspacing="0">
                         <thead class="custom-thead">
                           <tr role="row">
@@ -101,9 +101,7 @@
                             <th class="align-content-center">Qty</th>
                             <th class="align-content-center">Price</th>
                             <th class="align-content-center">Total Price</th>
-                            <% if (isEdit) { %>
-                              <th class="align-content-center d-flex justify-content-center">Action</th>
-                              <% } %>
+                            <th class="align-content-center d-flex justify-content-center">Action</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -120,7 +118,8 @@
                           </div>
                           <div class="col-md-10 align-self-center">
                             <input type="text" class="form-control" id="totalsum" name="totalsum"
-                              value="<%= saleData ? saleData.totalsum : '' %>" autocomplete="off" required readonly>
+                              value="<%= saleData ? saleData.totalsum : '' %>" autocomplete="off" required readonly
+                              disabled>
                           </div>
                         </div>
                         <div class="row form-group">
@@ -128,7 +127,7 @@
                             <label for="pay">Pay</label>
                           </div>
                           <div class="col-md-10 align-self-center">
-                            <input type="text" class="form-control" id="pay" name="pay"
+                            <input type="number" class="form-control" id="pay" name="pay" step="1" min="0"
                               value="<%= saleData ? saleData.pay : '' %>" autocomplete="off" required>
                           </div>
                         </div>
@@ -138,17 +137,18 @@
                           </div>
                           <div class="col-md-10 align-self-center">
                             <input type="text" class="form-control" id="change" name="change"
-                              value="<%= saleData ? saleData.change : '' %>" autocomplete="off" required readonly>
+                              value="<%= saleData ? saleData.change : '' %>" autocomplete="off" required readonly
+                              disabled>
                           </div>
                         </div>
                         <div class="row form-group">
                           <div class="col-md-2 align-self-center">
-                            <label for="customer">Supplier</label>
+                            <label for="customer">Customer</label>
                           </div>
                           <div class="col-md-10 align-self-center">
                             <select class="form-control" name="customer" id="customer">
                               <option value="<%= saleData ? saleData.customer : '' %>" selected>
-                                <%= saleData ? saleData.customername : 'Select a supplier' %>
+                                <%= saleData ? saleData.customername : 'Select a customer' %>
                               </option>
                             </select>
                           </div>
@@ -180,4 +180,296 @@
     </div>
     <!-- End of Page Wrapper -->
     <%- include('../partials/baseScripts') %>
+      <script>
+        const invoice = $("#invoice").val();
+        let totalPrice = 0;
+        let itemToDelete = null;
+
+        const calculateTotalPrice = () => {
+          const quantity = parseFloat($('#quantity').val()) || 0;
+          const salePrice = parseFloat($('#goodsSellingPrice').val()) || 0;
+          totalPrice = quantity * salePrice;
+          const formattedTotalPrice = totalPrice.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' });
+          $('#totalPrice').val(formattedTotalPrice);
+        };
+
+        const calculateChange = () => {
+          const pay = parseInt($('#pay').val()) || 0;
+          let formattedTotalSum = $('#totalsum').val();
+          let numericTotalSum = formattedTotalSum.replace(/[Rp.\s]/g, '');
+          const totalSum = parseInt(numericTotalSum) || 0;
+          const change = pay - totalSum;
+          $('#change').val(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(change));
+        };
+
+        const formatTotalSum = () => {
+          $.ajax({
+            url: '/sales/api/sale/' + invoice,
+            type: 'GET',
+            success: function (data) {
+              $('#totalsum').val(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.data.totalsum));
+              $('#change').val(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data.data.change));
+            },
+            error: function (xhr, status, error) {
+              console.error(error);
+            }
+          });
+        };
+
+        $(document).ready(function () {
+          // Initialize DataTable for purchaseItems
+          $("#dataTableSaleItems").DataTable({
+            responsive: true,
+            layout: {
+              topStart: null,
+              topEnd: null,
+              bottomStart: null,
+              bottomEnd: null,
+              bottom: null,
+            },
+            ordering: false,
+            language: {
+              emptyTable: "No data available in table",
+            },
+            ajax: {
+              url: "/sales/api/sale/" + invoice + "/items",
+              dataSrc: "data",
+            },
+            columns: [
+              {
+                data: null,
+                render: function (data, type, row, meta) {
+                  return meta.row + 1;
+                }
+              },
+              { data: "itemcode" },
+              { data: "itemname" },
+              { data: "quantity" },
+              {
+                data: "sellingprice",
+                render: function (data, type, row) {
+                  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+                }
+              },
+              {
+                data: "totalprice",
+                render: function (data, type, row) {
+                  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+                }
+              },
+              {
+                data: "id",
+                render: function (data, type, row) {
+                  return `<button class="btn btn-danger btn-sm btn-delete-item" data-id="${data}" data-type="saleitem"><i class="fas fa-trash"></i></button>`;
+                }
+              }
+            ],
+            createdRow: function (row, data, dataIndex) {
+              $('td', row).addClass('align-middle');
+              $('td:eq(6)', row).addClass('d-flex justify-content-center');
+            }
+          });
+
+          $('#goodsBarcode').select2({
+            placeholder: "Select a item",
+            allowClear: true,
+            theme: 'bootstrap4',
+            sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
+            ajax: {
+              url: '/goods/api/goods',
+              dataType: 'json',
+              data: function (params) {
+                return {
+                  q: params.term
+                };
+              },
+              processResults: function (data) {
+                return {
+                  results: data.data.map(function (item) {
+                    return {
+                      id: item.barcode,
+                      text: `${item.barcode} - ${item.name}`,
+                    };
+                  })
+                };
+              },
+              cache: false
+            },
+          }).on('select2:select', function (e) {
+            const selectedBarcode = e.params.data.id;
+            $.ajax({
+              url: '/goods/api/goods/' + selectedBarcode,
+              type: 'GET',
+              success: function (data) {
+                $('#goodsName').val(data.data.name);
+                $('#goodsStock').val(data.data.stock);
+                $('#goodsSellingPrice').val(data.data.sellingprice);
+              },
+              error: function (xhr, status, error) {
+                console.error(error);
+              }
+            });
+          });
+
+          $('#customer').select2({
+            placeholder: "Select a customer",
+            allowClear: true,
+            theme: 'bootstrap4',
+            sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
+            ajax: {
+              url: '/customers/api/customers',
+              dataType: 'json',
+              data: function (params) {
+                return {
+                  q: params.term
+                };
+              },
+              processResults: function (data) {
+                return {
+                  results: data.data.map(function (item) {
+                    return {
+                      id: item.customerid,
+                      text: item.name
+                    };
+                  })
+                };
+              },
+              cache: false
+            },
+          });
+
+          $('#quantity, #goodsSellingPrice').on('input', function () {
+            calculateTotalPrice();
+          }).on('change', function () {
+            calculateTotalPrice();
+          }).on('focus', function () {
+            calculateTotalPrice();
+          });
+
+          $('<div id="notification" class="text-danger fs-6" style="padding: 0 .3rem"></div>').insertAfter('#pay');
+
+          $('#pay').on('input', function () {
+            const pay = parseInt($(this).val()) || 0;
+            const totalSum = parseInt($('#totalsum').val().replace(/[Rp.\s]/g, '')) || 0;
+            if (pay < totalSum) {
+              $('#notification').text('The payment amount must be at least equal to the total sum.').show();
+            } else {
+              $('#notification').hide();
+            }
+            calculateChange();
+          }).on('focus', function () {
+            if ($(this).val() === '0.00') {
+              $(this).val('');
+              calculateChange();
+            }
+          }).on('blur', function () {
+            if ($(this).val() === '') {
+              $(this).val('0.00');
+              calculateChange();
+            }
+          });
+
+          $('#btnAddItemPurchase').on('click', function (e) {
+            e.preventDefault();
+            const itemcode = $('#goodsBarcode').val();
+            const itemname = $('#goodsName').val();
+            const quantity = $('#quantity').val();
+            const totalprice = totalPrice;
+            const sellingprice = $('#goodsSellingPrice').val();
+            $.ajax({
+              url: '/sales/api/sale/' + invoice + '/item',
+              type: 'POST',
+              contentType: 'application/json',
+              data: JSON.stringify({ invoice, itemcode, quantity, sellingprice, totalprice }),
+              success: function (response) {
+                $('#dataTableSaleItems').DataTable().ajax.reload();
+                $('#goodsBarcode').val(null).trigger('change');
+                $('#goodsName').val('');
+                $('#goodsStock').val('');
+                $('#goodsSellingPrice').val('');
+                $('#quantity').val('');
+                $('#totalPrice').val('');
+                totalPrice = 0;
+                formatTotalSum();
+                calculateChange();
+              },
+              error: function (xhr, status, error) {
+                const response = xhr.responseJSON;
+                if (response && response.redirect) {
+                  window.location.href = response.redirect;
+                } else {
+                  console.error(xhr.statusText);
+                }
+              }
+            });
+          });
+
+          $('#btnFinishPurchase').on('click', function (e) {
+            e.preventDefault();
+            let pay = $('#pay').val();
+            pay = parseInt(pay);
+            let change = $('#change').val();
+            if (change.includes('Rp')) {
+              change = change.replace(/[Rp.\s]/g, '');
+            }
+            change = parseInt(change);
+            const customer = $('#customer').val();
+
+
+            $.ajax({
+              url: '/sales/api/sale/' + invoice,
+              type: 'PUT',
+              contentType: 'application/json',
+              data: JSON.stringify({ invoice, pay, change, customer }),
+              success: function (response) {
+                window.location.href = '/sales';
+              },
+              error: function (xhr, status, error) {
+                const response = xhr.responseJSON;
+                if (response && response.redirect) {
+                  window.location.href = response.redirect;
+                } else {
+                  console.error(xhr.statusText);
+                }
+              }
+            });
+          });
+
+          // Event listener for delete button
+          $('#dataTableSaleItems').on('click', '.btn-delete-item', function () {
+            const id = $(this).data('id');
+            const type = $(this).data('type');
+            $('#deleteModal').data('id', id).data('type', type).modal('show');
+          });
+
+          // Event listener for confirm delete button in modal
+          $('#confirmDelete').on('click', function () {
+            const id = $('#deleteModal').data('id');
+            const type = $('#deleteModal').data('type');
+            if (type === 'saleitem') {
+              $.ajax({
+                url: '/sales/api/sale/' + invoice + '/item/' + id,
+                method: 'DELETE',
+                success: function (response) {
+                  $('#dataTableSaleItems').DataTable().ajax.reload();
+                  $('#goodsBarcode').val(null).trigger('change');
+                  $('#goodsName').val('');
+                  $('#goodsStock').val('');
+                  $('#goodsSellingPrice').val('');
+                  $('#quantity').val('');
+                  $('#totalPrice').val('');
+                  $('#deleteModal').modal('hide');
+                  formatTotalSum();
+                  calculateChange();
+                },
+                error: function (error) {
+                  console.error(`Error deleting ${type}:`, error);
+                  $('#deleteModal').modal('hide');
+                }
+              });
+            }
+          });
+          formatTotalSum();
+        });
+      </script>
       <%- include('../partials/layoutBottom') %>

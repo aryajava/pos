@@ -30,7 +30,6 @@ export default (pool) => {
         titlePage: 'Sales',
         titleForm: 'Transaction',
         description: 'This is form to add Sales',
-        isEdit: false,
         saleData: { ...saleData, time: moment(saleData.time).format('DD MMM YYYY HH:mm:ss') },
       });
     } catch (error) {
@@ -48,7 +47,6 @@ export default (pool) => {
         titlePage: 'Sales',
         titleForm: 'Transaction',
         description: 'This is form to edit Sales',
-        isEdit: true,
         saleData: { ...saleData, time: moment(saleData.time).format('DD MMM YYYY HH:mm:ss') },
       });
     } catch (error) {
@@ -70,11 +68,11 @@ export default (pool) => {
   });
 
   // get sale by invoice
-  router.get('/api/sales/:invoice', checkSession, async function (req, res) {
+  router.get('/api/sale/:invoice', checkSession, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       const saleData = await Sale.findbyInvoice({ pool, invoice });
-      // saleData.time = moment(saleData.time).format('DD MMM YYYY HH:mm:ss');
+      saleData.time = moment(saleData.time).format('DD MMM YYYY HH:mm:ss');
       res.json({ data: saleData });
     } catch (error) {
       res.status(500).json({
@@ -84,19 +82,19 @@ export default (pool) => {
   });
 
   // save and update sale
-  router.post('/api/sales', checkSession, async function (req, res) {
+  router.put('/api/sale/:invoice', checkSession, async function (req, res) {
     const { invoice, pay, change, customer } = req.body;
     const saleData = { pay, change, customer };
     try {
-      const updatedSale = await Sale.update(pool, invoice, saleData);
-      res.json({ data: updatedSale });
+      await Sale.update(pool, invoice, saleData);
+      res.json({ success: true, message: 'Sale successfully updated' });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ success: false, message: error.message });
     }
   });
 
   // delete sale
-  router.delete('/api/sales/:invoice', checkSession, async function (req, res) {
+  router.delete('/delete/:invoice', checkSession, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       await Sale.delete(pool, invoice);
@@ -107,7 +105,7 @@ export default (pool) => {
   });
 
   // get list sale item by invoice
-  router.get('/api/sales/:invoice/items', checkSession, async function (req, res) {
+  router.get('/api/sale/:invoice/items', checkSession, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       const saleItemsData = await SaleItem.findAllByInvoice(pool, invoice);
@@ -118,7 +116,7 @@ export default (pool) => {
   });
 
   // add item to sale
-  router.post('/api/sales/:invoice/item', checkSession, async function (req, res) {
+  router.post('/api/sale/:invoice/item', checkSession, async function (req, res) {
     const { invoice, itemcode, quantity, sellingprice, totalprice } = req.body;
     const itemData = { invoice, itemcode, quantity, sellingprice, totalprice };
     try {
@@ -130,7 +128,7 @@ export default (pool) => {
   });
 
   // delete item from sale
-  router.delete('/api/sales/:invoice/item/:id', checkSession, async function (req, res) {
+  router.delete('/api/sale/:invoice/item/:id', checkSession, async function (req, res) {
     const { id } = req.params;
     try {
       await SaleItem.deleteItem(pool, id);
