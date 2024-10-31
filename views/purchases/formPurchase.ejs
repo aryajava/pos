@@ -255,6 +255,7 @@
           placeholder: "Select a item",
           allowClear: true,
           theme: 'bootstrap4',
+          sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
           ajax: {
             url: '/goods/api/goods',
             dataType: 'json',
@@ -295,6 +296,7 @@
           placeholder: "Select a supplier",
           allowClear: true,
           theme: 'bootstrap4',
+          sorter: data => data.sort((a, b) => a.text.localeCompare(b.text)),
           ajax: {
             url: '/suppliers/api/suppliers',
             dataType: 'json',
