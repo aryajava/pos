@@ -1,5 +1,6 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
+import { saleFormValidation, saleItemFormValidation } from '../middlewares/formValidation.js';
 import moment from 'moment/moment.js';
 import Sale from '../models/Sale.js';
 import SaleItem from '../models/SaleItem.js';
@@ -72,7 +73,6 @@ export default (pool) => {
     const invoice = req.params.invoice;
     try {
       const saleData = await Sale.findbyInvoice({ pool, invoice });
-      saleData.time = moment(saleData.time).format('DD MMM YYYY HH:mm:ss');
       res.json({ data: saleData });
     } catch (error) {
       res.status(500).json({
@@ -82,7 +82,7 @@ export default (pool) => {
   });
 
   // save and update sale
-  router.put('/api/sale/:invoice', checkSession, async function (req, res) {
+  router.put('/api/sale/:invoice', checkSession, saleFormValidation, async function (req, res) {
     const { invoice, pay, change, customer } = req.body;
     const saleData = { pay, change, customer };
     try {
@@ -116,7 +116,7 @@ export default (pool) => {
   });
 
   // add item to sale
-  router.post('/api/sale/:invoice/item', checkSession, async function (req, res) {
+  router.post('/api/sale/:invoice/item', checkSession, saleItemFormValidation, async function (req, res) {
     const { invoice, itemcode, quantity, sellingprice, totalprice } = req.body;
     const itemData = { invoice, itemcode, quantity, sellingprice, totalprice };
     try {

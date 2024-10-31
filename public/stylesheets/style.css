@@ -60,7 +60,20 @@ div#notification {
   padding-inline: .2rem;
 }
 
-/* styles.css */
+.blink {
+  visibility: hidden;
+}
+
+#notification {
+  transition: opacity 0.3s ease-in-out;
+  /* Smooth transition */
+}
+
+#notification.blink {
+  opacity: 0;
+  /* Change opacity to create blink effect */
+}
+
 #preview {
   max-width: 30%;
   height: auto;

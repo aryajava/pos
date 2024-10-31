@@ -327,6 +327,8 @@
               processResults: function (data) {
                 return {
                   results: data.data.map(function (item) {
+                    console.log('Type of id:', typeof item.customerid);
+                    console.log('Type of text:', typeof item.name);
                     return {
                       id: item.customerid,
                       text: item.name
@@ -413,9 +415,21 @@
               change = change.replace(/[Rp.\s]/g, '');
             }
             change = parseInt(change);
-            const customer = $('#customer').val();
-
-
+            let customer = $('#customer').val();
+            customer = parseInt(customer);
+            if (pay < parseInt($('#totalsum').val().replace(/[Rp.\s]/g, ''))) {
+              $('#notification').text('The payment amount must be at least equal to the total sum.').show();
+              let blinkCount = 0;
+              const blinkInterval = setInterval(() => {
+                $('#notification').toggleClass('blink');
+                blinkCount++;
+                if (blinkCount >= 6) { // 6 toggles = 3 blinks
+                  clearInterval(blinkInterval);
+                  $('#notification').removeClass('blink');
+                }
+              }, 300);
+              return;
+            }
             $.ajax({
               url: '/sales/api/sale/' + invoice,
               type: 'PUT',

@@ -206,3 +206,40 @@ export const customerFormUpdateValidation = (req, res, next) => {
   }
   return next();
 };
+
+// Sale
+
+export const saleFormValidation = (req, res, next) => {
+  const { invoice } = req.params;
+  let { pay, change, customer } = req.body;
+  try {
+    if (!pay || !customer) {
+      req.flash('error', 'Please fill all fields');
+      return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/sales/edit/${invoice}` });
+    } else if (pay < (pay - change)) {
+      req.flash('error', 'Pay must be greater than total summary');
+      return res.status(400).json({ success: false, message: 'The payment must be at least equal to the total summary', redirect: `/sales/edit/${invoice}` });
+    }
+    return next();
+  } catch (error) {
+    res.status(400).json({ success: false, message: error });
+  }
+};
+
+// SaleItem
+
+export const saleItemFormValidation = (req, res, next) => {
+  let { invoice, itemcode, quantity, sellingprice, totalprice } = req.body;
+  quantity = parseInt(quantity);
+  sellingprice = parseInt(sellingprice);
+  totalprice = parseInt(totalprice);
+  if (!invoice || !itemcode || !quantity || !sellingprice || !totalprice) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/sales/edit/${invoice}` });
+  }
+  if (invoice.trim() === '' || itemcode.trim() === '' || sellingprice < 1 || quantity < 1 || totalprice < 1) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).json({ success: false, message: 'Please fill all fields with valid input', redirect: `/sales/edit/${invoice}` });
+  }
+  return next();
+};
