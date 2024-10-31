@@ -50,9 +50,7 @@ export default (pool) => {
         titleForm: 'Transaction',
         description: 'This is form to edit Purchases',
         isEdit: true,
-        purchaseData: { ...purchaseData, time: moment(purchaseData.time).format('DD MMM YYYY HH:mm:ss') },
-        success: req.flash('success'),
-        error: req.flash('error'),
+        purchaseData: { ...purchaseData, time: moment(purchaseData.time).format('DD MMM YYYY HH:mm:ss') }
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -95,7 +93,7 @@ export default (pool) => {
   });
 
   // delete purchase
-  router.delete('/api/purchase/:invoice', checkSession, async function (req, res) {
+  router.delete('/delete/:invoice', checkSession, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       await Purchase.delete(pool, invoice);
