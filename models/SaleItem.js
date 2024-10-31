@@ -63,14 +63,14 @@ export default class SaleItem {
     }
   };
 
-  static async deleteItem(pool, invoice, itemcode) {
+  static async deleteItem(pool, id) {
     try {
       const query = `
         DELETE FROM saleitems
-        WHERE invoice = $1 AND itemcode = $2
+        WHERE id = $1
         RETURNING *
       `;
-      const result = await pool.query(query, [invoice, itemcode]);
+      const result = await pool.query(query, [id]);
       return result.rows[0];
     } catch (error) {
       error.message = "Error deleteItem: " + error.message;
