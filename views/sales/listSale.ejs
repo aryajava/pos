@@ -1,0 +1,80 @@
+<%- include('../partials/layoutTop') %>
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+    <!-- Sidebar -->
+    <%- include('../partials/sidebar') %>
+      <!-- End of Sidebar -->
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <%- include('../partials/topbar') %>
+            <!-- End of Topbar -->
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+              <!-- Page Heading -->
+              <h1 class="h3 mb-2 text-gray-800">
+                <%= titlePage %>
+              </h1>
+              <p class="mb-4">
+                <%= description %>
+              </p>
+              <!-- DataTable -->
+              <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                  <a href="/sales/add" class="btn btn-primary btn-icon-split m-0">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-plus"></i>
+                    </span>
+                    <span class="text">Add</span>
+                  </a>
+                </div>
+                <div class="card-body">
+                  <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTableSale" width="100%"
+                      aria-describedby="dataTable_info" cellspacing="0">
+                      <thead>
+                        <tr role="row">
+                          <th class="align-content-center">Invoice</th>
+                          <th class="align-content-center">Time</th>
+                          <th class="align-content-center">Total Summary</th>
+                          <th class="align-content-center">Pay</th>
+                          <th class="align-content-center">Change</th>
+                          <th class="align-content-center">Customer</th>
+                          <th class="align-content-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tfoot>
+                        <tr>
+                          <th>Invoice</th>
+                          <th>Time</th>
+                          <th>Total Summary</th>
+                          <th>Pay</th>
+                          <th>Change</th>
+                          <th>Customer</th>
+                          <th>Action</th>
+                        </tr>
+                      </tfoot>
+                      <tbody>
+                        <!-- DataTables will populate this section -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+        <!-- Footer -->
+        <%- include('../partials/footer') %>
+          <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+  </div>
+  <!-- End of Page Wrapper -->
+  <%- include('../partials/baseScripts') %>
+    <%- include('../partials/layoutBottom') %>

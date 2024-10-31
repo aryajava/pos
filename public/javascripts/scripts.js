@@ -302,11 +302,76 @@ $(document).ready(function () {
         data: "customerid",
         render: function (data, type, row) {
           return `
+          <div class="action-buttons">
+          <a href="/customers/edit/${data}" class="btn btn-success m-1">
+          <i class="fas fa-pencil-alt"></i>
+          </a>
+          <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="customer">
+          <i class="fas fa-trash"></i>
+          </button>
+          </div>
+          `;
+        },
+        orderable: false
+      },
+    ],
+    createdRow: function (row, data, dataIndex) {
+      $('td', row).addClass('align-middle');
+    }
+  });
+
+  // Initialize DataTable for sales
+  $("#dataTableSale").DataTable({
+    responsive: true,
+    searching: true,
+    lengthMenu: [3, 10, 100],
+    language: {
+      emptyTable: "No data available in table",
+      lengthMenu: "Show _MENU_ entries",
+      paginate: {
+        first: null,
+        previous: "Previous",
+        next: "Next",
+        last: null,
+      },
+      sort: "ascending",
+    },
+    sortable: true,
+    ajax: {
+      url: "/sales/api/sales",
+      dataSrc: "data",
+    },
+    columns: [
+      { data: "invoice" },
+      { data: "time" },
+      {
+        data: "totalsum",
+        render: function (data, type, row) {
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+        }
+      },
+      {
+        data: "pay",
+        render: function (data, type, row) {
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+        }
+      },
+      {
+        data: "change",
+        render: function (data, type, row) {
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+        }
+      },
+      { data: "customername" },
+      {
+        data: "invoice",
+        render: function (data, type, row) {
+          return `
               <div class="action-buttons">
-                <a href="/customers/edit/${data}" class="btn btn-success m-1">
+                <a href="/sales/edit/${data}" class="btn btn-success m-1">
                   <i class="fas fa-pencil-alt"></i>
                 </a>
-                <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="customer">
+                <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="sale">
                   <i class="fas fa-trash"></i>
                 </button>
               </div>
@@ -341,9 +406,11 @@ $(document).ready(function () {
     } else if (type === 'supplier') {
       url = `/suppliers/delete/${id}`;
     } else if (type === 'purchase') {
-      url = `/purchases/api/purchase/${id}`;
+      url = `/purchases/delete/${id}`;
     } else if (type === 'customer') {
       url = `/customers/delete/${id}`;
+    } else if (type === 'sale') {
+      url = `/sales/delete/${id}`;
     }
     if (url) {
       $.ajax({
@@ -363,6 +430,8 @@ $(document).ready(function () {
             $('#dataTablePurchase').DataTable().ajax.reload();
           } else if (type === 'customer') {
             $('#dataTableCustomer').DataTable().ajax.reload();
+          } else if (type === 'sale') {
+            $('#dataTableSale').DataTable().ajax.reload();
           }
         },
         error: function (error) {
