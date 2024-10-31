@@ -7,7 +7,6 @@ import moment from 'moment/moment.js';
 const router = express.Router();
 
 export default (pool) => {
-
   router.get('/', checkSession, async function (req, res) {
     const purchasesData = await Purchase.findAll(pool);
     res.render('purchases/listPurchase', {
