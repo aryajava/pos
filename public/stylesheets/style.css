@@ -56,6 +56,10 @@ table.dataTable td.dt-type-numeric {
   padding: 0;
 }
 
+div#notification {
+  padding-inline: .2rem;
+}
+
 /* styles.css */
 #preview {
   max-width: 30%;
