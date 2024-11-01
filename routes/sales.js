@@ -8,6 +8,7 @@ const router = express.Router();
 
 export default (pool) => {
   router.get('/', checkSession, async function (req, res) {
+    delete req.session.currentInvoice;
     const salesData = await Sale.findAll(pool);
     res.render('sales/listSale', {
       user: req.session.user,
@@ -20,11 +21,21 @@ export default (pool) => {
 
   router.get('/add', checkSession, async function (req, res) {
     const operator = req.session.user.userid;
-    const newSale = new Sale(pool, null, operator);
-    try {
-      const createdSale = await Sale.create(newSale);
-      const saleData = await Sale.findbyInvoice({ pool, invoice: createdSale.invoice });
+    let invoice = req.session.currentInvoice;
 
+    if (!invoice) {
+      const newSale = new Sale(pool, null, operator);
+      try {
+        const createdSale = await Sale.create(newSale);
+        invoice = createdSale.invoice;
+        req.session.currentInvoice = invoice;
+      } catch (error) {
+        return res.status(500).json({ error: error.message });
+      }
+    }
+
+    try {
+      const saleData = await Sale.findbyInvoice({ pool, invoice });
       res.render('sales/formSale', {
         user: req.session.user,
         title: 'POS - Add Sales',

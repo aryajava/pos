@@ -8,6 +8,7 @@ const router = express.Router();
 
 export default (pool) => {
   router.get('/', checkSession, async function (req, res) {
+    delete req.session.currentInvoice;
     const purchasesData = await Purchase.findAll(pool);
     res.render('purchases/listPurchase', {
       user: req.session.user,
@@ -20,11 +21,19 @@ export default (pool) => {
 
   router.get('/add', checkSession, async function (req, res) {
     const operator = req.session.user.userid;
-    const newPurchase = new Purchase(pool, null, operator);
+    let invoice = req.session.currentInvoice;
+    if (!invoice) {
+      const newPurchase = new Purchase(pool, null, operator);
+      try {
+        const createdPurchase = await Purchase.create(newPurchase);
+        invoice = createdPurchase.invoice;
+        req.session.currentInvoice = invoice;
+      } catch (error) {
+        return res.status(500).json({ error: error.message });
+      }
+    }
     try {
-      const createdPurchase = await Purchase.create(newPurchase);
-      const purchaseData = await Purchase.findbyInvoice({ pool, invoice: createdPurchase.invoice });
-
+      const purchaseData = await Purchase.findbyInvoice({ pool, invoice });
       res.render('purchases/formPurchase', {
         user: req.session.user,
         title: 'POS - Add Purchases',
