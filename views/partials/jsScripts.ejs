@@ -54,4 +54,15 @@
 <script src="/js/responsive.bootstrap4.min.js"></script>
 <script src="/js/select2.min.js"></script>
 <script src="vendor/chart.js/Chart.min.js"></script>
+<script>
+  $.fn.dataTable.ext.type.order['invoice-pre'] = function (data) {
+    var matches = data.match(/INV-(?:PENJ)?(\d{8})-(\d+)/);
+    if (matches) {
+      var datePart = matches[1];
+      // var sequencePart = matches[2];
+      return parseInt(datePart, 10);
+    }
+    return 0;
+  };
+</script>
 <script src="/javascripts/scripts.js"></script>

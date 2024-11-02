@@ -235,13 +235,12 @@ $(document).ready(function () {
       },
       sort: "ascending",
     },
-    sortable: true,
     ajax: {
       url: "/purchases/api/purchases",
       dataSrc: "data",
     },
     columns: [
-      { data: "invoice" },
+      { data: "invoice", type: "invoice" },
       { data: "time" },
       {
         data: "totalsum",
@@ -342,7 +341,7 @@ $(document).ready(function () {
       dataSrc: "data",
     },
     columns: [
-      { data: "invoice" },
+      { data: "invoice", type: "invoice" },
       { data: "time" },
       {
         data: "totalsum",
