@@ -48,7 +48,6 @@ export default class Unit {
   }
 
   static async update(pool, newUnit, name, note, oldUnit) {
-    console.log(newUnit, name, note, oldUnit);
     try {
       const query = `UPDATE units SET unit = $1, name = $2, note = $3 WHERE unit = $4 RETURNING *`;
       const results = await pool.query(query, [newUnit, name, note, oldUnit]);

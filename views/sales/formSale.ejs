@@ -327,8 +327,6 @@
               processResults: function (data) {
                 return {
                   results: data.data.map(function (item) {
-                    console.log('Type of id:', typeof item.customerid);
-                    console.log('Type of text:', typeof item.name);
                     return {
                       id: item.customerid,
                       text: item.name

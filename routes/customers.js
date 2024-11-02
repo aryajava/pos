@@ -68,8 +68,6 @@ export default (pool) => {
   router.post('/edit/:id', checkSession, customerFormUpdateValidation, async (req, res) => {
     const { id } = req.params;
     const { name, address, phone } = req.body;
-    console.log(`id: ${id}, name: ${name}, address: ${address}, phone: ${phone}`);
-
     try {
       const customerData = new Customer(pool, id, name, address, phone);
       await Customer.update(customerData);

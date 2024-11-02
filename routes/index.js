@@ -6,8 +6,6 @@ const router = express.Router();
 
 export default (pool) => {
   router.get('/', checkSession, async function (req, res, next) {
-    const data = await Dashboard.getMonthlyEarning(pool, {});
-    console.log(`data: ${JSON.stringify(data)}`);
     res.render('index', {
       user: req.session.user,
       title: `Dashboard`,
@@ -21,10 +19,6 @@ export default (pool) => {
     try {
       let { startdate, enddate } = req.query;
       const data = await Dashboard.getMonthlyEarning(pool, { startdate, enddate });
-
-      console.log(`startdate: ${startdate}, enddate: ${enddate}`);
-      console.log(`data: ${JSON.stringify(data)}`);
-
       data.forEach((item) => {
         item.date = moment(item.date).format('MMM YY');
       });
