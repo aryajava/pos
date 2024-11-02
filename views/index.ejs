@@ -15,9 +15,17 @@
               <!-- End of Topbar -->
               <!-- Begin Page Content -->
               <div class="container-fluid">
-                <h1>
-                  Welcome, <%= user.name %>
-                </h1>
+                <div class="d-flex justify-content-between mb-4">
+                  <h1 class="h3 mb-0 text-gray-800">
+                    <%= title %>
+                  </h1>
+                  <button class="btn btn-primary btn-icon-split btn-sm ml-auto" id="generateReport">
+                    <span class="icon text-white-50">
+                      <i class="fas fa-download"></i>
+                    </span>
+                    <span class="text">Generate Report</span>
+                  </button>
+                </div>
                 <div class="row">
                   <div class="col-md-12 mb-4">
                     <div class="card shadow">
@@ -512,7 +520,7 @@
             order: [],
             createdRow: function (row, data, dataIndex) {
               $('td', row).addClass('align-middle');
-            }
+            },
           });
 
           $('#searchQuery').on('click', function (e) {
@@ -528,6 +536,43 @@
             dtMonthlyEarning.ajax.reload();
             fetchData();
           });
+
+          $('#generateReport').on('click', function (e) {
+            e.preventDefault();
+            $.ajax({
+              url: '/dashboard/api/summary/reportcsv',
+              method: 'GET',
+              data: {
+                startdate: $('#startdate').val(),
+                enddate: $('#enddate').val()
+              },
+              xhrFields: {
+                responseType: 'blob'
+              },
+              success: function (data, status, xhr) {
+                const disposition = xhr.getResponseHeader('Content-Disposition');
+                let filename = 'Monthly_Earnings_Report.csv';
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                  const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                  const matches = filenameRegex.exec(disposition);
+                  if (matches != null && matches[1]) {
+                    filename = matches[1].replace(/['"]/g, '');
+                  }
+                }
+                const url = window.URL.createObjectURL(data);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching report CSV:', textStatus, errorThrown);
+              }
+            });
+          });
+
           fetchData();
         });
       </script>

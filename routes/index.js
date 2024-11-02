@@ -2,6 +2,7 @@ import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
 import Dashboard from '../models/Dashboard.js';
 import moment from 'moment/moment.js';
+import XLSX from 'xlsx';
 const router = express.Router();
 
 export default (pool) => {
@@ -50,6 +51,35 @@ export default (pool) => {
       error.message = "Error getFinancialSummary: " + error.message;
       next(error);
     };
+  });
+
+  // summary report
+  router.get('/api/summary/reportcsv', async (req, res) => {
+    try {
+      let { startdate, enddate } = req.query;
+      const reportData = await Dashboard.getMonthlyEarning(pool, { startdate, enddate });
+      reportData.forEach((item) => {
+        item.date = moment(item.date).format('MMM YY');
+        item.expense = parseInt(item.expense);
+        item.revenue = parseInt(item.revenue);
+        item.earning = parseInt(item.earning);
+      });
+      const worksheet = XLSX.utils.json_to_sheet(reportData, { header: ['date', 'expense', 'revenue', 'earning'] });
+      worksheet['A1'].v = 'Month';
+      worksheet['B1'].v = 'Expense';
+      worksheet['C1'].v = 'Revenue';
+      worksheet['D1'].v = 'Earning';
+      const workbook = XLSX.utils.book_new();
+      const filename = `Monthly-Report-${moment().format("YYYY-MMDDHHmmss")}`;
+      XLSX.utils.book_append_sheet(workbook, worksheet, filename);
+      const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'csv' });
+      res.header('Content-Type', 'text/csv');
+      res.attachment(`${filename}.csv`);
+      res.send(buffer);
+    } catch (error) {
+      console.error('Error generating report CSV:', error);
+      res.status(500).json({ error: 'Failed to generate report CSV' });
+    }
   });
 
   return router;
