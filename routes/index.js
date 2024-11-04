@@ -70,7 +70,23 @@ export default (pool) => {
       worksheet['C1'].v = 'Revenue';
       worksheet['D1'].v = 'Earning';
       const workbook = XLSX.utils.book_new();
-      const filename = `Monthly-Report-${moment().format("YYYY-MMDDHHmmss")}`;
+      let sd, ed, filename = new String();
+      filename = `monthly-report-${moment().format("YYYY")}`;
+      if (startdate || enddate) {
+        if (startdate && !enddate) {
+          sd = moment(startdate).format('MMM');
+          ed = moment(reportData[reportData.length - 1].date, 'MMM YY').format('MMM');
+          filename = `monthly-report-${moment().format("YYYY")}-${sd}-${ed}`;
+        } else if (!startdate && enddate) {
+          sd = moment(reportData[0].date, 'MMM YY').format('MMM');
+          ed = moment(enddate).format('MMM');
+          filename = `monthly-report-${moment().format("YYYY")}-${sd}-${ed}`;
+        } else {
+          sd = moment(startdate).format('MMM');
+          ed = moment(enddate).format('MMM');
+          filename = `monthly-report-${moment().format("YYYY")}-${sd}-${ed}`;
+        }
+      }
       XLSX.utils.book_append_sheet(workbook, worksheet, filename);
       const buffer = XLSX.write(workbook, { type: 'buffer', bookType: 'csv' });
       res.header('Content-Type', 'text/csv');
