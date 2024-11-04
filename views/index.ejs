@@ -248,10 +248,10 @@
                             </thead>
                             <tfoot>
                               <tr>
-                                <th>Monthly</th>
-                                <th>Expense</th>
-                                <th>Revenue</th>
-                                <th>Earning</th>
+                                <th>Total</th>
+                                <th>Rp. 0,00</th>
+                                <th>Rp. 0,00</th>
+                                <th>Rp. 0,00</th>
                               </tr>
                             </tfoot>
                             <tbody>
@@ -521,6 +521,40 @@
             createdRow: function (row, data, dataIndex) {
               $('td', row).addClass('align-middle');
             },
+            footerCallback: function (row, data, start, end, display) {
+              var api = this.api(), data;
+              var intVal = function (i) {
+                return typeof i === 'string' ?
+                  i.replace(/[\$,]/g, '') * 1 :
+                  typeof i === 'number' ?
+                    i : 0;
+              };
+
+              totalExpense = api
+                .column(1)
+                .data()
+                .reduce(function (a, b) {
+                  return intVal(a) + intVal(b);
+                }, 0);
+
+              totalRevenue = api
+                .column(2)
+                .data()
+                .reduce(function (a, b) {
+                  return intVal(a) + intVal(b);
+                }, 0);
+
+              totalEarning = api
+                .column(3)
+                .data()
+                .reduce(function (a, b) {
+                  return intVal(a) + intVal(b);
+                }, 0);
+
+              $(api.column(1).footer()).html(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalExpense));
+              $(api.column(2).footer()).html(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalRevenue));
+              $(api.column(3).footer()).html(new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(totalEarning));
+            }
           });
 
           $('#searchQuery').on('click', function (e) {
