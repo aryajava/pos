@@ -132,16 +132,16 @@ export default (pool) => {
     // tambahkan middleware untuk velidasi newpassword dengan retypepassword
     const { id } = req.session.user;
     const { oldpassword, newpassword } = req.body;
-    const userData = { id, oldpassword, newpassword };
     try {
       const getUser = await User.findById(pool, id);
       if (!bcrypt.compareSync(oldpassword, getUser.password)) {
         req.flash('error', 'Old password is incorrect');
         return res.status(400).redirect('/users/change-password');
       }
-
-      // await User.changePassword(pool, userData);
-      res.redirect('back');
+      const userData = { id, newpassword };
+      await User.updatePassword(pool, userData);
+      req.flash('success', 'Password updated successfully');
+      res.redirect('/users/change-password');
     } catch (error) {
       next(error);
     }
