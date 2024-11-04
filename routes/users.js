@@ -1,7 +1,7 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { checkSession } from '../middlewares/checkSession.js';
-import { userFormAddValidation, userFormUpdateValidation } from '../middlewares/formValidation.js';
+import { userChangePasswordValidation, userFormAddValidation, userFormUpdateValidation, userProfileValidation } from '../middlewares/formValidation.js';
 import User from '../models/User.js';
 const router = express.Router();
 
@@ -102,7 +102,7 @@ export default (pool) => {
     });
   });
 
-  router.post('/profile', checkSession, async function (req, res, next) {
+  router.post('/profile', checkSession, userProfileValidation, async function (req, res, next) {
     const { id } = req.session.user;
     const { email, name } = req.body;
     const userData = { id, email, name };
@@ -128,8 +128,7 @@ export default (pool) => {
     });
   });
 
-  router.post('/change-password', checkSession, async function (req, res, next) {
-    // tambahkan middleware untuk velidasi newpassword dengan retypepassword
+  router.post('/change-password', checkSession, userChangePasswordValidation, async function (req, res, next) {
     const { id } = req.session.user;
     const { oldpassword, newpassword } = req.body;
     try {

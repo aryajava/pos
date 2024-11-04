@@ -55,6 +55,40 @@ export const userFormUpdateValidation = (req, res, next) => {
   return next();
 };
 
+export const userChangePasswordValidation = (req, res, next) => {
+  const { oldpassword, newpassword, retypepassword } = req.body;
+  if (!oldpassword || !newpassword || !retypepassword) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).redirect(`/users/change-password`);
+  }
+  if (oldpassword.trim() === '' || newpassword.trim() === '' || retypepassword.trim() === '') {
+    req.flash('error', 'Please fill all fields with valid input');
+    return res.status(400).redirect(`/users/change-password`);
+  }
+  if (newpassword !== retypepassword) {
+    req.flash('error', `Retype Password doesn't match with New Password`);
+    return res.status(400).redirect(`/users/change-password`);
+  }
+  return next();
+};
+
+export const userProfileValidation = (req, res, next) => {
+  const { email, name } = req.body;
+  if (!email || !name) {
+    req.flash('error', 'Please fill all fields');
+    return res.status(400).redirect(`/users/profile`);
+  }
+  if (!emailRegex.test(email) || name.trim() === '') {
+    req.flash('error', 'Please fill all fields with valid input');
+    return res.status(400).redirect(`/users/profile`);
+  }
+  if (req.session.user.email === email && req.session.user.name === name) {
+    req.flash('error', 'No changes made');
+    return res.status(400).redirect(`/users/profile`);
+  }
+  return next();
+};
+
 // Unit
 
 export const unitFormAddValidation = (req, res, next) => {
