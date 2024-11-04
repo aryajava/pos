@@ -20,7 +20,7 @@ export default (pool) => {
   });
 
   router.get('/add', checkSession, async function (req, res) {
-    const operator = req.session.user.userid;
+    const operator = req.session.user.id;
     let invoice = req.session.currentInvoice;
 
     if (!invoice) {

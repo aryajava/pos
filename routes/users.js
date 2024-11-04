@@ -1,4 +1,5 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
 import { checkSession } from '../middlewares/checkSession.js';
 import { userFormAddValidation, userFormUpdateValidation } from '../middlewares/formValidation.js';
 import User from '../models/User.js';
@@ -35,6 +36,7 @@ export default (pool) => {
         return res.status(409).redirect('/users/add');
       }
       const newUser = new User(pool, email, name, password, role);
+
       await User.save(pool, newUser);
       res.redirect('/users');
     } catch (error) {
@@ -65,7 +67,7 @@ export default (pool) => {
   router.post('/edit/:id', checkSession, userFormUpdateValidation, async function (req, res, next) {
     const { id } = req.params;
     const { email, name, role } = req.body;
-
+    const sessionUser = req.session.user;
     try {
       const existingUser = await User.findById(pool, id);
       if (existingUser.email === email) {
@@ -78,8 +80,68 @@ export default (pool) => {
         return res.status(409).redirect(`/users/edit/${id}`);
       }
       const userData = { email, name, role };
-      await User.update(pool, userData, id);
+      const newUser = await User.update(pool, userData, id);
+      if (sessionUser.id === parseInt(id)) {
+        req.session.user = { ...req.session.user, email: newUser.email, name: newUser.name, role: newUser.role };
+      }
       res.redirect('/users');
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/profile', checkSession, async function (req, res, next) {
+    const { id, email, name } = req.session.user;
+    res.render('users/profile', {
+      title: `POS - Users Profile`,
+      titlePage: `Profile`,
+      titleForm: `Your Profile`,
+      user: req.session.user,
+      profile: true,
+      userData: { id, email, name }
+    });
+  });
+
+  router.post('/profile', checkSession, async function (req, res, next) {
+    const { id } = req.session.user;
+    const { email, name } = req.body;
+    const userData = { id, email, name };
+
+    try {
+      await User.updateProfile(pool, userData);
+      req.session.user = { ...req.session.user, email, name };
+      req.flash('success', 'Profile updated successfully');
+      res.redirect('/users/profile');
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/change-password', checkSession, function (req, res, next) {
+    res.render('users/profile', {
+      title: `POS - Users Change Password`,
+      titlePage: `Change Password`,
+      titleForm: `Change Your Password`,
+      user: req.session.user,
+      profile: false,
+      userData: null
+    });
+  });
+
+  router.post('/change-password', checkSession, async function (req, res, next) {
+    // tambahkan middleware untuk velidasi newpassword dengan retypepassword
+    const { id } = req.session.user;
+    const { oldpassword, newpassword } = req.body;
+    const userData = { id, oldpassword, newpassword };
+    try {
+      const getUser = await User.findById(pool, id);
+      if (!bcrypt.compareSync(oldpassword, getUser.password)) {
+        req.flash('error', 'Old password is incorrect');
+        return res.status(400).redirect('/users/change-password');
+      }
+
+      // await User.changePassword(pool, userData);
+      res.redirect('back');
     } catch (error) {
       next(error);
     }

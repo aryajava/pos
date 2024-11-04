@@ -31,7 +31,12 @@ export default (pool) => {
         req.flash("error", "Email or Password is wrong");
         return res.redirect("/");
       }
-      req.session.user = user;
+      req.session.user = {
+        id: user.userid,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      };
       res.redirect("/dashboard");
     } catch (error) {
       console.error(error);
