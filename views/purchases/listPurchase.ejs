@@ -73,4 +73,61 @@
   </div>
   <!-- End of Page Wrapper -->
   <%- include('../partials/jsScripts') %>
+    <script>
+      const userId = `<%= user.id %>`
+      $(document).ready(function () {
+        // Initialize DataTable for purchases
+        $("#dataTablePurchase").DataTable({
+          responsive: true,
+          searching: true,
+          lengthMenu: [3, 10, 100],
+          language: {
+            emptyTable: "No data available in table",
+            lengthMenu: "Show _MENU_ entries",
+            paginate: {
+              first: null,
+              previous: "Previous",
+              next: "Next",
+              last: null,
+            },
+            sort: "ascending",
+          },
+          ajax: {
+            url: "/purchases/api/purchases",
+            dataSrc: "data",
+          },
+          columns: [
+            { data: "invoice", type: "invoice" },
+            { data: "time" },
+            {
+              data: "totalsum",
+              render: function (data, type, row) {
+                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
+              }
+            },
+            { data: "suppliername" },
+            {
+              data: "invoice",
+              render: function (data, type, row) {
+                const isOwner = row.operator === parseInt(userId);
+                return `
+                  <div class="action-buttons">
+                    <button class="btn btn-success m-1 ${isOwner ? '' : 'disabled'}" onclick="window.location.href='/purchases/edit/${data}'" ${isOwner ? '' : 'disabled'}>
+                      <i class="fas fa-pencil-alt"></i>
+                    </button>
+                    <button class="btn btn-danger delete-btn m-1 ${isOwner ? '' : 'disabled'}" data-id="${data}" data-type="purchase" ${isOwner ? '' : 'disabled'}>
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                `;
+              },
+              orderable: false
+            },
+          ],
+          createdRow: function (row, data, dataIndex) {
+            $('td', row).addClass('align-middle');
+          }
+        });
+      });
+    </script>
     <%- include('../partials/layoutBottom') %>

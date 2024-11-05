@@ -1,12 +1,13 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
+import { checkRoleOperator } from '../middlewares/checkOwnership.js';
 import Dashboard from '../models/Dashboard.js';
 import moment from 'moment/moment.js';
 import XLSX from 'xlsx';
 const router = express.Router();
 
 export default (pool) => {
-  router.get('/', checkSession, async function (req, res, next) {
+  router.get('/', checkSession, checkRoleOperator, async function (req, res, next) {
     res.render('index', {
       user: req.session.user,
       title: `Dashboard`,
@@ -16,7 +17,7 @@ export default (pool) => {
   });
 
   // list monthly earnings
-  router.get('/api/monthlyearnings', checkSession, async function (req, res, next) {
+  router.get('/api/monthlyearnings', checkSession, checkRoleOperator, async function (req, res, next) {
     try {
       let { startdate, enddate } = req.query;
       const data = await Dashboard.getMonthlyEarning(pool, { startdate, enddate });
@@ -31,7 +32,7 @@ export default (pool) => {
   });
 
   // revenue sources
-  router.get('/api/revenuesources', async function (req, res, next) {
+  router.get('/api/revenuesources', checkSession, checkRoleOperator, async function (req, res, next) {
     try {
       const { startdate, enddate } = req.query;
       const data = await Dashboard.getRevenueSources(pool, { startdate, enddate });
@@ -43,7 +44,7 @@ export default (pool) => {
   });
 
   // financial summary
-  router.get('/api/summary', async function (req, res, next) {
+  router.get('/api/summary', checkSession, checkRoleOperator, async function (req, res, next) {
     try {
       const data = await Dashboard.getFinancialSummary(pool);
       res.status(200).json({ data });
@@ -54,7 +55,7 @@ export default (pool) => {
   });
 
   // summary report
-  router.get('/api/summary/reportcsv', async (req, res) => {
+  router.get('/api/summary/reportcsv', checkSession, checkRoleOperator, async (req, res) => {
     try {
       let { startdate, enddate } = req.query;
       const reportData = await Dashboard.getMonthlyEarning(pool, { startdate, enddate });

@@ -1,13 +1,14 @@
 import express from 'express';
 import bcrypt from 'bcrypt';
 import { checkSession } from '../middlewares/checkSession.js';
+import { checkRoleOperator } from '../middlewares/checkOwnership.js';
 import { userChangePasswordValidation, userFormAddValidation, userFormUpdateValidation, userProfileValidation } from '../middlewares/formValidation.js';
 import User from '../models/User.js';
 const router = express.Router();
 
 export default (pool) => {
 
-  router.get('/', checkSession, async function (req, res, next) {
+  router.get('/', checkSession, checkRoleOperator, async function (req, res, next) {
     const usersData = await User.findAll(pool);
     res.render('users/listUser', {
       user: req.session.user,
@@ -18,7 +19,7 @@ export default (pool) => {
     });
   });
 
-  router.get('/add', checkSession, function (req, res, next) {
+  router.get('/add', checkSession, checkRoleOperator, function (req, res, next) {
     res.render('users/formUser', {
       title: `POS - Users`,
       titlePage: `Users`,
@@ -28,7 +29,7 @@ export default (pool) => {
     });
   });
 
-  router.post('/add', checkSession, userFormAddValidation, async function (req, res, next) {
+  router.post('/add', checkSession, checkRoleOperator, userFormAddValidation, async function (req, res, next) {
     try {
       const { email, name, password, role } = req.body;
       if (await User.findByEmail(pool, email)) {
@@ -44,7 +45,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/edit/:id', checkSession, async function (req, res, next) {
+  router.get('/edit/:id', checkSession, checkRoleOperator, async function (req, res, next) {
     const { id } = req.params;
     try {
       const userData = await User.findById(pool, id);
@@ -64,7 +65,7 @@ export default (pool) => {
     }
   });
 
-  router.post('/edit/:id', checkSession, userFormUpdateValidation, async function (req, res, next) {
+  router.post('/edit/:id', checkSession, checkRoleOperator, userFormUpdateValidation, async function (req, res, next) {
     const { id } = req.params;
     const { email, name, role } = req.body;
     const sessionUser = req.session.user;
@@ -148,7 +149,7 @@ export default (pool) => {
 
   // API
 
-  router.delete('/delete/:id', checkSession, async function (req, res, next) {
+  router.delete('/delete/:id', checkSession, checkRoleOperator, async function (req, res, next) {
     const { id } = req.params;
     try {
       await User.delete(pool, id);
@@ -159,7 +160,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/api/users', checkSession, async function (req, res, next) {
+  router.get('/api/users', checkSession, checkRoleOperator, async function (req, res, next) {
     try {
       const usersData = await User.findAll(pool);
       res.json({

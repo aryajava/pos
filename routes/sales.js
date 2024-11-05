@@ -4,6 +4,7 @@ import { saleFormValidation, saleItemFormValidation } from '../middlewares/formV
 import moment from 'moment/moment.js';
 import Sale from '../models/Sale.js';
 import SaleItem from '../models/SaleItem.js';
+import { checkOwnershipSales } from '../middlewares/checkOwnership.js';
 const router = express.Router();
 
 export default (pool) => {
@@ -49,7 +50,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/edit/:invoice', checkSession, async function (req, res) {
+  router.get('/edit/:invoice', checkSession, checkOwnershipSales, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       const saleData = await Sale.findbyInvoice({ pool, invoice });
@@ -80,7 +81,7 @@ export default (pool) => {
   });
 
   // get sale by invoice
-  router.get('/api/sale/:invoice', checkSession, async function (req, res) {
+  router.get('/api/sale/:invoice', checkSession, checkOwnershipSales, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       const saleData = await Sale.findbyInvoice({ pool, invoice });
@@ -93,7 +94,7 @@ export default (pool) => {
   });
 
   // save and update sale
-  router.put('/api/sale/:invoice', checkSession, saleFormValidation, async function (req, res) {
+  router.put('/api/sale/:invoice', checkSession, checkOwnershipSales, saleFormValidation, async function (req, res) {
     const { invoice, pay, change, customer } = req.body;
     const saleData = { pay, change, customer };
     try {
@@ -105,7 +106,7 @@ export default (pool) => {
   });
 
   // delete sale
-  router.delete('/delete/:invoice', checkSession, async function (req, res) {
+  router.delete('/delete/:invoice', checkSession, checkOwnershipSales, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       await Sale.delete(pool, invoice);

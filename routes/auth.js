@@ -37,7 +37,7 @@ export default (pool) => {
         name: user.name,
         role: user.role,
       };
-      res.redirect("/dashboard");
+      res.redirect("/");
     } catch (error) {
       console.error(error);
       req.flash("error", "An unexpected error occurred");

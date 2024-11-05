@@ -219,58 +219,6 @@ $(document).ready(function () {
     }
   });
 
-  // Initialize DataTable for purchases
-  $("#dataTablePurchase").DataTable({
-    responsive: true,
-    searching: true,
-    lengthMenu: [3, 10, 100],
-    language: {
-      emptyTable: "No data available in table",
-      lengthMenu: "Show _MENU_ entries",
-      paginate: {
-        first: null,
-        previous: "Previous",
-        next: "Next",
-        last: null,
-      },
-      sort: "ascending",
-    },
-    ajax: {
-      url: "/purchases/api/purchases",
-      dataSrc: "data",
-    },
-    columns: [
-      { data: "invoice", type: "invoice" },
-      { data: "time" },
-      {
-        data: "totalsum",
-        render: function (data, type, row) {
-          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
-        }
-      },
-      { data: "suppliername" },
-      {
-        data: "invoice",
-        render: function (data, type, row) {
-          return `
-              <div class="action-buttons">
-                <a href="/purchases/edit/${data}" class="btn btn-success m-1">
-                  <i class="fas fa-pencil-alt"></i>
-                </a>
-                <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="purchase">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            `;
-        },
-        orderable: false
-      },
-    ],
-    createdRow: function (row, data, dataIndex) {
-      $('td', row).addClass('align-middle');
-    }
-  });
-
   // Initialize DataTable for customers
   $("#dataTableCustomer").DataTable({
     responsive: true,
@@ -310,71 +258,6 @@ $(document).ready(function () {
           </button>
           </div>
           `;
-        },
-        orderable: false
-      },
-    ],
-    createdRow: function (row, data, dataIndex) {
-      $('td', row).addClass('align-middle');
-    }
-  });
-
-  // Initialize DataTable for sales
-  $("#dataTableSale").DataTable({
-    responsive: true,
-    searching: true,
-    lengthMenu: [3, 10, 100],
-    language: {
-      emptyTable: "No data available in table",
-      lengthMenu: "Show _MENU_ entries",
-      paginate: {
-        first: null,
-        previous: "Previous",
-        next: "Next",
-        last: null,
-      },
-      sort: "ascending",
-    },
-    sortable: true,
-    ajax: {
-      url: "/sales/api/sales",
-      dataSrc: "data",
-    },
-    columns: [
-      { data: "invoice", type: "invoice" },
-      { data: "time" },
-      {
-        data: "totalsum",
-        render: function (data, type, row) {
-          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
-        }
-      },
-      {
-        data: "pay",
-        render: function (data, type, row) {
-          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
-        }
-      },
-      {
-        data: "change",
-        render: function (data, type, row) {
-          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
-        }
-      },
-      { data: "customername" },
-      {
-        data: "invoice",
-        render: function (data, type, row) {
-          return `
-              <div class="action-buttons">
-                <a href="/sales/edit/${data}" class="btn btn-success m-1">
-                  <i class="fas fa-pencil-alt"></i>
-                </a>
-                <button class="btn btn-danger delete-btn m-1" data-id="${data}" data-type="sale">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </div>
-            `;
         },
         orderable: false
       },

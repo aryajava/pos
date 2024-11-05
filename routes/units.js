@@ -1,11 +1,12 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
+import { checkRoleOperator } from '../middlewares/checkOwnership.js';
 import { unitFormAddValidation, unitFormUpdateValidation } from '../middlewares/formValidation.js';
 import Unit from '../models/Unit.js';
 const router = express.Router();
 
 export default (pool) => {
-  router.get('/', checkSession, async function (req, res, next) {
+  router.get('/', checkSession, checkRoleOperator, async function (req, res, next) {
     const unitsData = await Unit.findAll(pool);
     res.render('units/listUnit', {
       user: req.session.user,
@@ -16,7 +17,7 @@ export default (pool) => {
     });
   });
 
-  router.get('/add', checkSession, async function (req, res, next) {
+  router.get('/add', checkSession, checkRoleOperator, async function (req, res, next) {
     res.render('units/formUnit', {
       user: req.session.user,
       title: `POS - Units`,
@@ -27,7 +28,7 @@ export default (pool) => {
     });
   });
 
-  router.post('/add', checkSession, unitFormAddValidation, async function (req, res, next) {
+  router.post('/add', checkSession, checkRoleOperator, unitFormAddValidation, async function (req, res, next) {
     try {
       const { unit, name, note } = req.body;
       if (await Unit.findByUnit(pool, unit)) {
@@ -43,7 +44,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/edit/:unit', checkSession, async function (req, res, next) {
+  router.get('/edit/:unit', checkSession, checkRoleOperator, checkRoleOperator, async function (req, res, next) {
     const { unit } = req.params;
     try {
       const unitData = await Unit.findByUnit(pool, unit);
@@ -65,7 +66,7 @@ export default (pool) => {
     }
   });
 
-  router.post('/edit/:oldUnit', checkSession, unitFormUpdateValidation, async function (req, res, next) {
+  router.post('/edit/:oldUnit', checkSession, checkRoleOperator, unitFormUpdateValidation, async function (req, res, next) {
     const { oldUnit } = req.params;
     const { unit, name, note } = req.body;
     try {
@@ -79,7 +80,7 @@ export default (pool) => {
 
   // API
 
-  router.delete('/delete/:unit', checkSession, async function (req, res, next) {
+  router.delete('/delete/:unit', checkSession, checkRoleOperator, async function (req, res, next) {
     const { unit } = req.params;
     try {
       await Unit.delete(pool, unit);
@@ -90,7 +91,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/api/units', checkSession, async function (req, res, next) {
+  router.get('/api/units', checkSession, checkRoleOperator, async function (req, res, next) {
     try {
       const searchQuery = req.query.q || '';
       const unitsData = await Unit.findAll(pool, searchQuery);

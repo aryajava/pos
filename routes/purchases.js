@@ -1,6 +1,7 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
 import { purchaseFormValidation, purchaseItemFormValidation } from '../middlewares/formValidation.js';
+import { checkOwnershipPurchase } from '../middlewares/checkOwnership.js';
 import Purchase from '../models/Purchase.js';
 import PurchaseItem from '../models/PurchaseItem.js';
 import moment from 'moment/moment.js';
@@ -48,7 +49,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/edit/:invoice', checkSession, async function (req, res) {
+  router.get('/edit/:invoice', checkSession, checkOwnershipPurchase, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       const purchaseData = await Purchase.findbyInvoice({ pool, invoice });
@@ -80,7 +81,7 @@ export default (pool) => {
   });
 
   // get purchase by invoice
-  router.get('/api/purchase/:invoice', checkSession, async function (req, res) {
+  router.get('/api/purchase/:invoice', checkSession, checkOwnershipPurchase, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       const purchaseData = await Purchase.findbyInvoice({ pool, invoice });
@@ -91,7 +92,7 @@ export default (pool) => {
   });
 
   // save and update purchase
-  router.put('/api/purchase/:invoice', checkSession, purchaseFormValidation, async function (req, res) {
+  router.put('/api/purchase/:invoice', checkSession, checkOwnershipPurchase, purchaseFormValidation, async function (req, res) {
     const { invoice, supplier } = req.body;
     try {
       await Purchase.update(pool, invoice, { supplier });
@@ -102,7 +103,7 @@ export default (pool) => {
   });
 
   // delete purchase
-  router.delete('/delete/:invoice', checkSession, async function (req, res) {
+  router.delete('/delete/:invoice', checkSession, checkOwnershipPurchase, async function (req, res) {
     const invoice = req.params.invoice;
     try {
       await Purchase.delete(pool, invoice);

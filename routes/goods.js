@@ -3,13 +3,14 @@ import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 import { checkSession } from '../middlewares/checkSession.js';
+import { checkRoleOperator } from '../middlewares/checkOwnership.js';
 import { goodsFormAddValidation, goodsFormUpdateValidation } from '../middlewares/formValidation.js';
 import Goods from '../models/Goods.js';
 const router = express.Router();
 const __dirname = import.meta.url.replace('file://', '');
 
 export default (pool) => {
-  router.get('/', checkSession, async (req, res, next) => {
+  router.get('/', checkSession, checkRoleOperator, async (req, res, next) => {
     res.render('goods/listGoods', {
       user: req.session.user,
       title: `POS - Goods`,
@@ -18,7 +19,7 @@ export default (pool) => {
     });
   });
 
-  router.get('/add', checkSession, async (req, res, next) => {
+  router.get('/add', checkSession, checkRoleOperator, async (req, res, next) => {
     res.render('goods/formGoods', {
       user: req.session.user,
       title: `POS - Add Goods`,
@@ -29,7 +30,7 @@ export default (pool) => {
     });
   });
 
-  router.post('/add', checkSession, goodsFormAddValidation, async (req, res, next) => {
+  router.post('/add', checkSession, checkRoleOperator, goodsFormAddValidation, async (req, res, next) => {
     const { barcode, name, stock, purchaseprice, sellingprice, unit } = req.body;
     try {
       let picture = null;
@@ -60,7 +61,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/edit/:barcode', checkSession, async (req, res, next) => {
+  router.get('/edit/:barcode', checkSession, checkRoleOperator, async (req, res, next) => {
     const { barcode } = req.params;
     try {
       const goodsData = await Goods.findByBarcode(pool, barcode);
@@ -85,7 +86,7 @@ export default (pool) => {
     }
   });
 
-  router.post('/edit/:barcode', checkSession, goodsFormUpdateValidation, async (req, res, next) => {
+  router.post('/edit/:barcode', checkSession, checkRoleOperator, goodsFormUpdateValidation, async (req, res, next) => {
     const { barcode } = req.params;
     const { name, stock, purchaseprice, sellingprice, unit } = req.body;
     try {
@@ -123,7 +124,7 @@ export default (pool) => {
 
   // API
 
-  router.delete('/delete/:barcode', checkSession, async (req, res, next) => {
+  router.delete('/delete/:barcode', checkSession, checkRoleOperator, async (req, res, next) => {
     const { barcode } = req.params;
     try {
       await Goods.delete(pool, barcode);
@@ -138,7 +139,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/api/goods', checkSession, async (req, res, next) => {
+  router.get('/api/goods', checkSession, checkRoleOperator, async (req, res, next) => {
     const searchQuery = req.query.q || '';
     try {
       const goodsData = await Goods.findAll(pool, searchQuery);
@@ -155,7 +156,7 @@ export default (pool) => {
     }
   });
 
-  router.get('/api/goods/:barcode', checkSession, async (req, res, next) => {
+  router.get('/api/goods/:barcode', checkSession, checkRoleOperator, async (req, res, next) => {
     const { barcode } = req.params;
     try {
       const goodsData = await Goods.findByBarcode(pool, barcode);
