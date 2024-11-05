@@ -11,7 +11,7 @@
   <!-- Divider -->
   <hr class="sidebar-divider my-0">
 
-  <% if (user && user.role==='operator' ) { %>
+  <% if (user && user.role==='admin' ) { %>
     <!-- Nav Item - Dashboard -->
     <li class="nav-item active">
       <a class="nav-link" href="/dashboard">
@@ -28,7 +28,7 @@
         Master
       </div>
 
-      <% if (user && user.role==='operator' ) { %>
+      <% if (user && user.role==='admin' ) { %>
         <!-- Nav Item - Utilities Collapse Menu -->
         <li class="nav-item">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
@@ -61,7 +61,7 @@
               <span>Customers</span></a>
           </li>
 
-          <% if (user && user.role==='operator' ) { %>
+          <% if (user && user.role==='admin' ) { %>
             <!-- Nav Item - Charts -->
             <li class="nav-item">
               <a class="nav-link" href="/users">

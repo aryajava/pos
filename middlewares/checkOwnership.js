@@ -3,7 +3,7 @@ import Purchase from "../models/Purchase.js";
 import Sale from "../models/Sale.js";
 
 export const checkRoleOperator = (req, res, next) => {
-  if (req.session.user && req.session.user.role === 'operator') {
+  if (req.session.user && req.session.user.role === 'admin') {
     return next();
   }
   return res.redirect('/sales')
