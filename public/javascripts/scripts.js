@@ -32,9 +32,9 @@ $(document).ready(function () {
     },
     columns: [
       { data: "userid" },
-      { data: "email" },
-      { data: "name" },
-      { data: "role" },
+      { data: "email", className: "user-email" },
+      { data: "name", className: "user-name" },
+      { data: "role", className: "user-role" },
       {
         data: "userid",
         render: function (data, type, row) {
@@ -53,6 +53,7 @@ $(document).ready(function () {
       },
     ],
     createdRow: function (row, data, dataIndex) {
+      $(row).attr('id', `user-${data.userid}`);
       $('td', row).addClass('align-middle');
     }
   });
@@ -79,9 +80,9 @@ $(document).ready(function () {
       dataSrc: "data",
     },
     columns: [
-      { data: "unit" },
-      { data: "name" },
-      { data: "note" },
+      { data: "unit", className: "unit-unit" },
+      { data: "name", className: "unit-name" },
+      { data: "note", className: "unit-note" },
       {
         data: "unit",
         render: function (data, type, row) {
@@ -100,6 +101,7 @@ $(document).ready(function () {
       },
     ],
     createdRow: function (row, data, dataIndex) {
+      $(row).attr('id', `unit-${data.unit}`);
       $('td', row).addClass('align-middle');
     }
   });
@@ -127,25 +129,26 @@ $(document).ready(function () {
     },
     columns: [
       { data: "barcode" },
-      { data: "name" },
-      { data: "stock" },
-      { data: "unit" },
+      { data: "name", className: "goods-name" },
+      { data: "stock", className: "goods-stock" },
+      { data: "unit", className: "goods-unit" },
       {
-        data: "purchaseprice",
+        data: "purchaseprice", className: "goods-purchaseprice",
         render: function (data, type, row) {
           return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
         }
       },
       {
-        data: "sellingprice",
+        data: "sellingprice", className: "goods-sellingprice",
         render: function (data, type, row) {
           return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
         }
       },
       {
-        data: "picture", render: function (data, type, row) {
+        data: "picture",
+        render: function (data, type, row) {
           const imageUrl = data ? data : 'asset/svg/no-image.svg';
-          return `<img src="${imageUrl}" alt="Picture" style="width: 100px; height: auto;" />`;
+          return `<img src="${imageUrl}" class="goods-picture" alt="Picture" style="width: 100px; height: auto;" />`;
         },
         orderable: false
       },
@@ -167,6 +170,7 @@ $(document).ready(function () {
       },
     ],
     createdRow: function (row, data, dataIndex) {
+      $(row).attr('id', `goods-${data.barcode}`);
       $('td', row).addClass('align-middle');
     }
   });
@@ -194,9 +198,9 @@ $(document).ready(function () {
     },
     columns: [
       { data: "supplierid" },
-      { data: "name" },
-      { data: "address" },
-      { data: "phone" },
+      { data: "name", className: "supplier-name" },
+      { data: "address", className: "supplier-address" },
+      { data: "phone", className: "supplier-phone" },
       {
         data: "supplierid",
         render: function (data, type, row) {
@@ -215,6 +219,7 @@ $(document).ready(function () {
       },
     ],
     createdRow: function (row, data, dataIndex) {
+      $(row).attr('id', `supplier-${data.supplierid}`);
       $('td', row).addClass('align-middle');
     }
   });
@@ -242,9 +247,9 @@ $(document).ready(function () {
     },
     columns: [
       { data: "customerid" },
-      { data: "name" },
-      { data: "address" },
-      { data: "phone" },
+      { data: "name", className: "customer-name" },
+      { data: "address", className: "customer-address" },
+      { data: "phone", className: "customer-phone" },
       {
         data: "customerid",
         render: function (data, type, row) {
@@ -263,6 +268,7 @@ $(document).ready(function () {
       },
     ],
     createdRow: function (row, data, dataIndex) {
+      $(row).attr('id', `customer-${data.customerid}`);
       $('td', row).addClass('align-middle');
     }
   });

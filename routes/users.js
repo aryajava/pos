@@ -36,9 +36,15 @@ export default (pool) => {
         req.flash('error', 'Email already registered');
         return res.status(409).redirect('/users/add');
       }
-      const newUser = new User(pool, email, name, password, role);
-
-      await User.save(pool, newUser);
+      const newUser = { email, name, password, role };
+      const savedUser = await User.save(pool, newUser);
+      const userData = {
+        userid: savedUser.userid,
+        email: savedUser.email,
+        name: savedUser.name,
+        role: savedUser.role
+      };
+      req.app.get('io').emit('userAdded', userData);
       res.redirect('/users');
     } catch (error) {
       next(error);
@@ -74,6 +80,8 @@ export default (pool) => {
       if (existingUser.email === email) {
         const userData = { email, name, role };
         await User.update(pool, userData, id);
+        const updatedUser = await User.findById(pool, id);
+        req.app.get('io').emit('userUpdated', updatedUser);
         return res.redirect('/users');
       }
       if (await User.findByEmail(pool, email)) {
@@ -82,9 +90,11 @@ export default (pool) => {
       }
       const userData = { email, name, role };
       const newUser = await User.update(pool, userData, id);
+
       if (sessionUser.id === parseInt(id)) {
         req.session.user = { ...req.session.user, email: newUser.email, name: newUser.name, role: newUser.role };
       }
+      req.app.get('io').emit('userUpdated', newUser);
       res.redirect('/users');
     } catch (error) {
       next(error);
@@ -112,6 +122,7 @@ export default (pool) => {
       await User.updateProfile(pool, userData);
       req.session.user = { ...req.session.user, email, name };
       req.flash('success', 'Profile updated successfully');
+      req.app.get('io').emit('userUpdated', userData);
       res.redirect('/users/profile');
     } catch (error) {
       next(error);
@@ -153,6 +164,7 @@ export default (pool) => {
     const { id } = req.params;
     try {
       await User.delete(pool, id);
+      req.app.get('io').emit('userDeleted', { id });
       res.status(200).json({ message: 'User deleted successfully' });
     } catch (error) {
       console.error('Error deleting user:', error);
