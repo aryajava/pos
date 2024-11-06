@@ -6,8 +6,8 @@ import logger from 'morgan';
 import flash from 'connect-flash';
 import session from 'express-session';
 import fileupload from 'express-fileupload';
-import dotenv from 'dotenv';
 import pkg from 'pg';
+import dotenv from 'dotenv';
 const { Pool } = pkg;
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 

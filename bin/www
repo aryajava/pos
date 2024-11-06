@@ -7,6 +7,8 @@
 import app from '../app.js';
 import debug from 'debug';
 import http from 'http';
+import { Server } from 'socket.io';
+import { checkStock } from '../routes/socket.js';
 debug('pos:server');
 
 /**
@@ -41,6 +43,22 @@ app.set('port', port);
  */
 
 const server = http.createServer(app);
+export const io = new Server(server, {
+  cors: {
+    origin: '*',
+  }
+});
+
+app.set('io', io);
+
+io.on('connection', (socket) => {
+  console.log('New client connected');
+  checkStock(socket);
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
 
 /**
  * Event listener for HTTP server "error" event.

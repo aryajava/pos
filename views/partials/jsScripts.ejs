@@ -65,4 +65,158 @@
     return 0;
   };
 </script>
+<!-- jsScripts.ejs -->
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  // socket users
+  socket.on('userAdded', (data) => {
+    $('#dataTableUser').DataTable().row.add({
+      userid: data.userid,
+      email: data.email,
+      name: data.name,
+      role: data.role,
+    }).draw(false);
+  });
+  socket.on('userUpdated', (data) => {
+    const userRow = $(`#user-${data.userid}`);
+    userRow.find('.user-email').text(data.email);
+    userRow.find('.user-name').text(data.name);
+    userRow.find('.user-role').text(data.role);
+  });
+  socket.on('userDeleted', (data) => {
+    $('#dataTableUser').DataTable().ajax.reload(null, false);
+  });
+
+  // socket units
+  socket.on('unitAdded', (data) => {
+    console.log(`Socket unitAdd`);
+    $('#dataTableUnit').DataTable().row.add({
+      unit: data.unit,
+      name: data.name,
+      note: data.note,
+    }).draw(false);
+  });
+  socket.on('unitUpdated', (data) => {
+    const unitRow = $(`#unit-${data.oldUnit}`);
+    if (unitRow.length) {
+      unitRow.attr('id', `unit-${data.unit}`);
+      unitRow.find('.unit-unit').text(data.unit);
+      unitRow.find('.unit-name').text(data.name);
+      unitRow.find('.unit-note').text(data.note);
+    } else {
+      console.error(`Element with ID #unit-${data.oldUnit} not found`);
+    }
+  });
+  socket.on('unitDeleted', (data) => {
+    $('#dataTableUnit').DataTable().ajax.reload(null, false);
+  });
+
+  // socket goods
+  socket.on('goodsAdded', (data) => {
+    $('#dataTableGoods').DataTable().row.add({
+      barcode: data.barcode,
+      name: data.name,
+      stock: data.stock,
+      unit: data.unit,
+      purchaseprice: data.purchaseprice,
+      sellingprice: data.sellingprice,
+      picture: data.picture ? data.picture : 'asset/svg/no-image.svg',
+    }).draw(false);
+  });
+  socket.on('goodsUpdated', (data) => {
+    const goodsRow = $(`#goods-${data.barcode}`);
+    goodsRow.find('.goods-name').text(data.name);
+    goodsRow.find('.goods-stock').text(data.stock);
+    goodsRow.find('.goods-unit').text(data.unit);
+    goodsRow.find('.goods-purchaseprice').text(data.purchaseprice);
+    goodsRow.find('.goods-sellingprice').text(data.sellingprice);
+    goodsRow.find('.goods-picture').attr('src', data.picture ? data.picture : 'asset/svg/no-image.svg');
+  });
+  socket.on('goodsDeleted', (data) => {
+    $('#dataTableGoods').DataTable().ajax.reload(null, false);
+  });
+
+  // socket suppliers
+
+  socket.on('stockAlert', (data) => {
+    const alertContainer = $('#alertContainer');
+    const alertCounter = $('#alertCounter');
+
+    // Cek jika alert sudah ada berdasarkan barcode
+    const existingAlert = alertContainer.find(`.dropdown-item[data-barcode="${data.barcode}"]`);
+    if (existingAlert.length === 0) {
+      // Jika belum ada, tambahkan alert baru
+      const alertItem = $(`
+      <a class="dropdown-item d-flex align-items-center" href="#" data-barcode="${data.barcode}" data-name="${data.name}">
+        <div class="mr-3">
+          <div class="icon-circle bg-warning">
+            <i class="fas fa-exclamation-triangle text-white"></i>
+          </div>
+        </div>
+        <div>
+          <div class="small text-gray-500">${new Date().toLocaleDateString()}</div>
+          <span class="font-weight-bold">Stock Alert: ${data.name} only have stock: ${data.stock}</span>
+        </div>
+      </a>
+    `);
+      alertContainer.append(alertItem);
+      alertCounter.text(parseInt(alertCounter.text()) + 1);
+
+      // Event listener untuk mengklik alert item
+      alertItem.on('click', function () {
+        const barcode = $(this).data('barcode');
+        const name = $(this).data('name');
+        window.location.href = `/purchases/add?barcode=${barcode}&name=${name}`;
+      });
+    }
+  });
+
+  socket.on('removeStockAlert', (data) => {
+    console.log(`Remove stock alert for ${data}`);
+
+    const alertContainer = $('#alertContainer');
+    const alertCounter = $('#alertCounter');
+    alertContainer.find(`.dropdown-item[data-barcode="${data.barcode}"]`).remove();
+    const currentCount = parseInt(alertCounter.text());
+    alertCounter.text(Math.max(currentCount - 1, 0));
+  });
+
+  // Function to get query parameter
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  // Set goodsBarcode if barcode is present in query string
+  $(document).ready(function () {
+    const barcode = getQueryParam('barcode');
+    const name = getQueryParam('name');
+
+    if (barcode) {
+      // Set the value and trigger the change event for Select2
+      const option = new Option(`${barcode} - ${name}`, barcode, true, true);
+      $('#goodsBarcode').append(option).trigger('change');
+      $.ajax({
+        url: '/goods/api/goods/' + barcode,
+        type: 'GET',
+        success: function (data) {
+          $('#goodsName').val(data.data.name);
+          $('#goodsStock').val(data.data.stock);
+          $('#goodsPurchasePrice').val(data.data.purchaseprice);
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        }
+      });
+
+      // Remove the query parameter from the URL
+      const url = new URL(window.location);
+      url.searchParams.delete('barcode');
+      url.searchParams.delete('name');
+      window.history.replaceState({}, document.title, url.toString());
+    }
+  });
+</script>
 <script src="/javascripts/scripts.js"></script>
