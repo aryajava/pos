@@ -35,7 +35,8 @@ export default (pool) => {
     try {
       const { name, address, phone } = req.body;
       const newSupplier = new Supplier(pool, name, address, phone);
-      await Supplier.save(pool, newSupplier);
+      const supplierAdded = await Supplier.save(pool, newSupplier);
+      req.app.get('io').emit('supplierAdded', supplierAdded);
       res.redirect('/suppliers');
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -72,7 +73,8 @@ export default (pool) => {
         return res.redirect('/suppliers');
       }
       const newSupplier = new Supplier(pool, name, address, phone);
-      await Supplier.update(pool, newSupplier, id);
+      const supplierUpdated = await Supplier.update(pool, newSupplier, id);
+      req.app.get('io').emit('supplierUpdated', supplierUpdated);
       res.redirect('/suppliers');
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -84,7 +86,8 @@ export default (pool) => {
   router.delete('/delete/:id', checkSession, async (req, res) => {
     const { id } = req.params;
     try {
-      await Supplier.delete(pool, id);
+      const supplierDeleted = await Supplier.delete(pool, id);
+      req.app.get('io').emit('supplierDeleted', supplierDeleted);
       res.status(200).json({ message: "Supplier deleted successfully" });
     } catch (error) {
       res.status(500).json({ error: error.message });

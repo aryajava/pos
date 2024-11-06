@@ -37,7 +37,8 @@ export default (pool) => {
     const { name, address, phone } = req.body;
     try {
       const newCustomer = new Customer(pool, null, name, address, phone);
-      await Customer.save(newCustomer);
+      const customerAdded = await Customer.save(newCustomer);
+      req.app.get('io').emit('customerAdded', customerAdded);
       res.redirect('/customers');
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -70,7 +71,8 @@ export default (pool) => {
     const { name, address, phone } = req.body;
     try {
       const customerData = new Customer(pool, id, name, address, phone);
-      await Customer.update(customerData);
+      const customerUpdated = await Customer.update(customerData);
+      req.app.get('io').emit('customerUpdated', customerUpdated);
       res.redirect('/customers');
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -82,8 +84,13 @@ export default (pool) => {
   router.delete('/delete/:id', checkSession, async (req, res) => {
     const { id } = req.params;
     try {
-      await Customer.delete(pool, id);
-      res.json({ message: 'Customer deleted' });
+      const customerData = await Customer.findById(pool, id);
+      if (!customerData) {
+        return res.status(404).json({ message: 'Customer not found' });
+      }
+      const customerDeleted = await Customer.delete(pool, id);
+      req.app.get('io').emit('customerDeleted', customerDeleted);
+      res.status(204).json({ message: 'Customer deleted' });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

@@ -59,6 +59,17 @@ export default class Goods {
     }
   }
 
+  static async checkStockLow(pool) {
+    try {
+      const query = `SELECT * FROM goods WHERE stock <= 5`;
+      const results = await pool.query(query);
+      return results.rows;
+    } catch (error) {
+      console.error(`Error checkStockLow: `, error);
+      throw error;
+    }
+  }
+
   static async update(pool, newGoods) {
     const { barcode, name, stock, purchaseprice, sellingprice, unit, picture } = newGoods;
     try {

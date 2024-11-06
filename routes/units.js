@@ -36,7 +36,8 @@ export default (pool) => {
         return res.redirect('/units/add');
       }
       const newUnit = new Unit(pool, unit, name, note);
-      await Unit.save(pool, newUnit);
+      const savedUnit = await Unit.save(pool, newUnit);
+      req.app.get('io').emit('unitAdded', savedUnit);
       res.redirect('/units');
     } catch (error) {
       console.error("Error adding unit:", error);
@@ -70,7 +71,12 @@ export default (pool) => {
     const { oldUnit } = req.params;
     const { unit, name, note } = req.body;
     try {
-      await Unit.update(pool, unit, name, note, oldUnit);
+      const updatedUnit = await Unit.update(pool, unit, name, note, oldUnit);
+      console.log(`updatedUnit: ${JSON.stringify(updatedUnit)}`);
+
+      req.app.get('io').emit('unitUpdated', { oldUnit, ...updatedUnit });
+      console.log(`unitUpdated event emitted`);
+
       res.redirect('/units');
     } catch (error) {
       console.error("Error updating unit:", error);
@@ -84,6 +90,7 @@ export default (pool) => {
     const { unit } = req.params;
     try {
       await Unit.delete(pool, unit);
+      req.app.get('io').emit('unitDeleted', unit);
       res.status(200).json({ message: "Unit deleted successfully" });
     } catch (error) {
       console.error("Error deleting unit:", error);

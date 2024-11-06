@@ -5,6 +5,7 @@ import { checkOwnershipPurchase } from '../middlewares/checkOwnership.js';
 import Purchase from '../models/Purchase.js';
 import PurchaseItem from '../models/PurchaseItem.js';
 import moment from 'moment/moment.js';
+import Goods from '../models/Goods.js';
 const router = express.Router();
 
 export default (pool) => {
@@ -23,16 +24,20 @@ export default (pool) => {
   router.get('/add', checkSession, async function (req, res) {
     const operator = req.session.user.id;
     let invoice = req.session.currentInvoice;
+    const barcodeAlert = req.query.barcode || '';
     if (!invoice) {
       const newPurchase = new Purchase(pool, null, operator);
       try {
         const createdPurchase = await Purchase.create(newPurchase);
+        const purchaseData = await Purchase.findbyInvoice({ pool, invoice: createdPurchase.invoice });
+        req.app.get('io').emit('purchaseAdded', { ...purchaseData, time: moment(purchaseData.time).format('DD MMM YYYY HH:mm:ss') });
         invoice = createdPurchase.invoice;
         req.session.currentInvoice = invoice;
       } catch (error) {
         return res.status(500).json({ error: error.message });
       }
     }
+
     try {
       const purchaseData = await Purchase.findbyInvoice({ pool, invoice });
       res.render('purchases/formPurchase', {
@@ -42,7 +47,7 @@ export default (pool) => {
         titleForm: 'Transaction',
         description: 'This is form to add Purchases',
         isEdit: false,
-        purchaseData: { ...purchaseData, time: moment(purchaseData.time).format('DD MMM YYYY HH:mm:ss') },
+        purchaseData: { ...purchaseData, time: moment(purchaseData.time).format('DD MMM YYYY HH:mm:ss'), itemcode: barcodeAlert },
       });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -95,7 +100,20 @@ export default (pool) => {
   router.put('/api/purchase/:invoice', checkSession, checkOwnershipPurchase, purchaseFormValidation, async function (req, res) {
     const { invoice, supplier } = req.body;
     try {
-      await Purchase.update(pool, invoice, { supplier });
+      const purchaseData = await Purchase.update(pool, invoice, { supplier });
+      const lowStockGoods = await Goods.checkStockLow(pool);
+      lowStockGoods.forEach((item) => {
+        req.app.get('io').emit('stockAlert', { barcode: item.barcode, stock: item.stock, name: item.name });
+      });
+      const purchaseItems = await PurchaseItem.findAllByInvoice(pool, invoice);
+      await Promise.all(purchaseItems.map(async (item) => {
+        const goods = await Goods.findByBarcode(pool, item.itemcode);
+        if (goods.stock > 5) {
+          req.app.get('io').emit('removeStockAlert', { barcode: item.itemcode, name: goods.name });
+        }
+      }));
+      const purchaseUpdated = await Purchase.findbyInvoice({ pool, invoice: purchaseData.invoice });
+      req.app.get('io').emit('purchaseUpdated', purchaseUpdated);
       res.json({ success: true, message: 'Purchase successfully updated' });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -107,6 +125,15 @@ export default (pool) => {
     const invoice = req.params.invoice;
     try {
       await Purchase.delete(pool, invoice);
+      const lowStockItems = await Goods.checkStockLow(pool);
+      lowStockItems.forEach((item) => {
+        req.app.get('io').emit('stockAlert', {
+          barcode: item.barcode,
+          stock: item.stock,
+          name: item.name,
+        });
+      });
+      req.app.get('io').emit('purchaseDeleted', invoice);
       res.json({ success: true, message: 'Purchase successfully deleted' });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });

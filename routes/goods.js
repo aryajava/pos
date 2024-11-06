@@ -1,4 +1,5 @@
 import express from 'express';
+import { io } from '../bin/www';
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
@@ -44,7 +45,6 @@ export default (pool) => {
           .resize(256, 256)
           .toFormat('jpg')
           .toFile(filePath);
-
         picture = `${timestamp}.jpg`;
       }
       const newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, picture);
@@ -52,7 +52,15 @@ export default (pool) => {
         req.flash("error", "Goods already exists");
         return res.redirect('/goods/add');
       }
-      await Goods.save(pool, newGoods);
+      const goodsAdded = await Goods.save(pool, newGoods);
+      goodsAdded.picture = picture ? `/asset/goods/${barcode}/${picture}` : null;
+      const checkStockLow = await Goods.checkStockLow(pool);
+      if (checkStockLow.length > 0) {
+        checkStockLow.forEach((item) => {
+          req.app.get('io').emit('stockAlert', { name: item.name, stock: item.stock, barcode: item.barcode, });
+        });
+      }
+      req.app.get('io').emit('goodsAdded', goodsAdded);
       res.redirect('/goods');
     } catch (error) {
       console.error("Error add goods:", error);
@@ -90,6 +98,7 @@ export default (pool) => {
     const { barcode } = req.params;
     const { name, stock, purchaseprice, sellingprice, unit } = req.body;
     try {
+      let newGoods = null;
       if (!await Goods.findByBarcode(pool, barcode)) {
         req.flash("error", "Goods not found");
         return res.redirect('/goods');
@@ -107,13 +116,20 @@ export default (pool) => {
           .resize(256, 256)
           .toFormat('jpg')
           .toFile(picturePath);
-        const newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, fileName);
-        await Goods.update(pool, newGoods);
+        newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, fileName);
       } else {
         const goodsData = await Goods.findByBarcode(pool, barcode);
-        const newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, goodsData.picture);
-        await Goods.update(pool, newGoods);
+        newGoods = new Goods(pool, barcode, name, stock, purchaseprice, sellingprice, unit, goodsData.picture);
       }
+      const updatedGoods = await Goods.update(pool, newGoods);
+      updatedGoods.picture = updatedGoods.picture ? `/asset/goods/${barcode}/${updatedGoods.picture}` : null;
+      if (updatedGoods.stock <= 5) {
+        req.app.get('io').emit('stockAlert', { name: updatedGoods.name, stock: updatedGoods.stock, barcode: updatedGoods.barcode });
+      } else {
+        req.app.get('io').emit('removeStockAlert', { barcode: updatedGoods.barcode });
+      }
+      console.log(`goodsUpdated: ${JSON.stringify(updatedGoods)}`);
+      req.app.get('io').emit('goodsUpdated', updatedGoods);
       res.redirect('/goods');
     } catch (error) {
       console.error("Error update goods:", error);
@@ -132,6 +148,8 @@ export default (pool) => {
       if (fs.existsSync(dir)) {
         fs.rmSync(dir, { recursive: true });
       }
+      req.app.get('io').emit('goodsDeleted', barcode);
+      req.app.get('io').emit('removeStockAlert', { barcode });
       res.json({ message: "Goods deleted" });
     } catch (error) {
       console.error("Error delete goods:", error);

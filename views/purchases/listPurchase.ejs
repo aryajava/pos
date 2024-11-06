@@ -100,12 +100,12 @@
             { data: "invoice", type: "invoice" },
             { data: "time" },
             {
-              data: "totalsum",
+              data: "totalsum", className: 'purchase-totalsum',
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
-            { data: "suppliername" },
+            { data: "suppliername", className: 'purchase-suppliername' },
             {
               data: "invoice",
               render: function (data, type, row) {
@@ -125,6 +125,7 @@
             },
           ],
           createdRow: function (row, data, dataIndex) {
+            $(row).attr('id', `purchase-${data.invoice}`);
             $('td', row).addClass('align-middle');
           }
         });

@@ -130,8 +130,14 @@
     goodsRow.find('.goods-name').text(data.name);
     goodsRow.find('.goods-stock').text(data.stock);
     goodsRow.find('.goods-unit').text(data.unit);
-    goodsRow.find('.goods-purchaseprice').text(data.purchaseprice);
-    goodsRow.find('.goods-sellingprice').text(data.sellingprice);
+    goodsRow.find('.goods-purchaseprice').text(new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(data.purchaseprice));
+    goodsRow.find('.goods-sellingprice').text(new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(data.sellingprice));
     goodsRow.find('.goods-picture').attr('src', data.picture ? data.picture : 'asset/svg/no-image.svg');
   });
   socket.on('goodsDeleted', (data) => {
@@ -139,6 +145,96 @@
   });
 
   // socket suppliers
+  socket.on('supplierAdded', (data) => {
+    $('#dataTableSupplier').DataTable().row.add({
+      supplierid: data.supplierid,
+      name: data.name,
+      address: data.address,
+      phone: data.phone,
+    }).draw(false);
+  });
+  socket.on('supplierUpdated', (data) => {
+    const supplierRow = $(`#supplier-${data.supplierid}`);
+    supplierRow.find('.supplier-name').text(data.name);
+    supplierRow.find('.supplier-address').text(data.address);
+    supplierRow.find('.supplier-phone').text(data.phone);
+  });
+  socket.on('supplierDeleted', (data) => {
+    $('#dataTableSupplier').DataTable().ajax.reload(null, false);
+  });
+
+  // socket customers
+  socket.on('customerAdded', (data) => {
+    $('#dataTableCustomer').DataTable().row.add({
+      customerid: data.customerid,
+      name: data.name,
+      address: data.address,
+      phone: data.phone,
+    }).draw(false);
+  });
+  socket.on('customerUpdated', (data) => {
+    const customerRow = $(`#customer-${data.customerid}`);
+    customerRow.find('.customer-name').text(data.name);
+    customerRow.find('.customer-address').text(data.address);
+    customerRow.find('.customer-phone').text(data.phone);
+  });
+  socket.on('customerDeleted', (data) => {
+    $('#dataTableCustomer').DataTable().ajax.reload(null, false);
+  });
+
+  // socket purchases
+  socket.on('purchaseAdded', (data) => {
+    $('#dataTablePurchase').DataTable().row.add({
+      invoice: data.invoice,
+      time: data.time,
+      totalsum: data.totalsum,
+      suppliername: data.suppliername ? data.suppliername : null,
+    }).draw(false);
+  });
+  socket.on('purchaseUpdated', (data) => {
+    const purchaseRow = $(`#purchase-${data.invoice}`);
+    purchaseRow.find('.purchase-time').text(data.time);
+    purchaseRow.find('.purchase-totalsum').text(new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(data.totalsum));
+    purchaseRow.find('.purchase-suppliername').text(data.suppliername);
+  });
+  socket.on('purchaseDeleted', (data) => {
+    $('#dataTablePurchase').DataTable().ajax.reload(null, false);
+  });
+
+  // socket sales
+  socket.on('saleAdded', (data) => {
+    $('#dataTableSale').DataTable().row.add({
+      invoice: data.invoice,
+      time: data.time,
+      totalsum: data.totalsum,
+      pay: data.pay,
+      change: data.change,
+      customername: data.customername,
+    }).draw(false);
+  });
+  socket.on('saleUpdated', (data) => {
+    const saleRow = $(`#sale-${data.invoice}`);
+    saleRow.find('.sale-time').text(data.time);
+    saleRow.find('.sale-totalsum').text(new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(data.totalsum));
+    saleRow.find('.sale-pay').text(new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(data.pay));
+    saleRow.find('.sale-change').text(new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR'
+    }).format(data.change));
+    saleRow.find('.sale-customername').text(data.customername);
+  });
+  socket.on('saleDeleted', (data) => {
+    $('#dataTableSale').DataTable().ajax.reload(null, false);
+  });
 
   socket.on('stockAlert', (data) => {
     const alertContainer = $('#alertContainer');
@@ -174,8 +270,6 @@
   });
 
   socket.on('removeStockAlert', (data) => {
-    console.log(`Remove stock alert for ${data}`);
-
     const alertContainer = $('#alertContainer');
     const alertCounter = $('#alertCounter');
     alertContainer.find(`.dropdown-item[data-barcode="${data.barcode}"]`).remove();

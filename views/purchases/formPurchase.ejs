@@ -53,7 +53,11 @@
                         <div class="row form-group">
                           <div class="col-md-4 align-self-center">
                             <label for="goodsBarcode">Goods Barcode</label>
-                            <select class="form-control" name="itemcode" id="goodsBarcode"></select>
+                            <select class="form-control" name="itemcode" id="goodsBarcode">
+                              <option value="<%= purchaseData ? purchaseData.itemcode : '' %>" selected>
+                                <%= purchaseData ? purchaseData.itemcode : 'Select a item' %>
+                              </option>
+                            </select>
                           </div>
                           <div class="col-md-4 align-self-center">
                             <label for="goodsName">Goods Name</label>
