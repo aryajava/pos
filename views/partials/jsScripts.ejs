@@ -37,7 +37,7 @@
       <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
       <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-        <a class="btn btn-primary" href="/logout">Logout</a>
+        <a class="btn btn-primary" href="/logout" onclick="handleLogout()">Logout</a>
       </div>
     </div>
   </div>
@@ -237,11 +237,8 @@
   });
 
   socket.on('stockAlert', (data) => {
-    console.log(`Stock Alert: ${data.name} only have stock: ${data.stock}, time: ${new Date()}`);
-
     const alertContainer = $('#alertContainer');
     const alertCounter = $('#alertCounter');
-
     // Cek jika alert sudah ada berdasarkan barcode
     const existingAlert = alertContainer.find(`.dropdown-item[data-barcode="${data.barcode}"]`);
     if (existingAlert.length === 0) {
@@ -272,8 +269,6 @@
   });
 
   socket.on('removeStockAlert', (data) => {
-    console.log(`Remove Stock Alert: ${data.name}, time: ${new Date()}`);
-
     const alertContainer = $('#alertContainer');
     const alertCounter = $('#alertCounter');
     alertContainer.find(`.dropdown-item[data-barcode="${data.barcode}"]`).remove();
@@ -285,6 +280,15 @@
   function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
+  }
+
+  function handleLogout() {
+    // Periksa apakah socket masih terhubung
+    if (socket && socket.connected) {
+      socket.disconnect();  // Menutup koneksi socket
+    }
+    // Redirect ke halaman logout
+    window.location.href = '/logout';
   }
 
   // Set goodsBarcode if barcode is present in query string

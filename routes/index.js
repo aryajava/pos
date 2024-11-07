@@ -22,7 +22,7 @@ export default (pool) => {
       let { startdate, enddate } = req.query;
       const data = await Dashboard.getMonthlyEarning(pool, { startdate, enddate });
       data.forEach((item) => {
-        item.date = moment(item.date).format('MMM YY');
+        item.month = moment(item.month).format('MMM YY');
       });
       res.status(200).json({ data });
     } catch (error) {
@@ -61,12 +61,12 @@ export default (pool) => {
       let { startdate, enddate } = req.query;
       const reportData = await Dashboard.getMonthlyEarning(pool, { startdate, enddate });
       reportData.forEach((item) => {
-        item.date = moment(item.date).format('MMM YY');
+        item.month = moment(item.month).format('MMM YY');
         item.expense = parseInt(item.expense);
         item.revenue = parseInt(item.revenue);
         item.earning = parseInt(item.earning);
       });
-      const worksheet = XLSX.utils.json_to_sheet(reportData, { header: ['date', 'expense', 'revenue', 'earning'] });
+      const worksheet = XLSX.utils.json_to_sheet(reportData, { header: ['month', 'expense', 'revenue', 'earning'] });
       worksheet['A1'].v = 'Month';
       worksheet['B1'].v = 'Expense';
       worksheet['C1'].v = 'Revenue';

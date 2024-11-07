@@ -438,7 +438,7 @@
             success: function (response) {
               if (response && response.data) {
                 const earningsData = response.data;
-                const earningsLabels = earningsData.map(item => item.date);
+                const earningsLabels = earningsData.map(item => item.month);
                 const earningsValues = earningsData.map(item => item.earning);
 
                 areaChartEarningOverview.data.labels = earningsLabels;
@@ -498,7 +498,7 @@
               }
             },
             columns: [
-              { data: "date" },
+              { data: "month" },
               {
                 data: "expense",
                 render: function (data, type, row) {

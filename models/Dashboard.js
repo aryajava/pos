@@ -35,21 +35,53 @@ export default class Dashboard {
   }
 
 
-  static async getMonthlyEarning(pool, searchDate = '') {
+  static async getMonthlyEarning(pool, searchDate = {}) {
     try {
-      let query = `SELECT * FROM monthlyearnings`;
-      const params = [];
-      const { startdate, enddate } = searchDate;
-      if (startdate && enddate) {
-        query += ` WHERE date BETWEEN $1 AND $2`;
-        params.push(startdate, enddate);
-      } else if (startdate) {
-        query += ` WHERE date >= $1`;
-        params.push(startdate);
-      } else if (enddate) {
-        query += ` WHERE date <= $1`;
-        params.push(enddate);
-      }
+      // SQL Query with searchDate conditions applied directly
+      let query = `
+          SELECT
+            COALESCE(saa.month, puu.month) as "month",
+            COALESCE(puu.expense, 0) as "expense",
+            COALESCE(saa.revenue, 0) as "revenue",
+            COALESCE(saa.revenue, 0) - COALESCE(puu.expense, 0) as "earning"
+          FROM
+            (
+              SELECT
+                SUBSTRING(pu.invoice, 5, 6) AS month,
+                SUM(totalsum) AS expense
+              FROM
+                (
+                  SELECT
+                    *
+                  FROM
+                    public.purchases
+                  WHERE ($1::date IS NULL OR time::DATE >= $1::date) AND ($2::date IS NULL OR time::DATE <= $2::date)
+                ) AS pu
+              GROUP BY
+                month
+            ) AS puu
+            FULL OUTER JOIN (
+              SELECT
+                SUBSTRING(sa.invoice, 9, 6) AS month,
+                SUM(totalsum) AS revenue
+              FROM
+                (
+                  SELECT
+                    *
+                  FROM
+                    public.sales
+                  WHERE ($1::date IS NULL OR time::DATE >= $1::date) AND ($2::date IS NULL OR time::DATE <= $2::date)
+                ) AS sa
+              GROUP BY
+                month
+            ) AS saa ON puu.month = saa.month
+          ORDER BY
+            "month" ASC;
+        `;
+
+      const params = [searchDate.startdate || null, searchDate.enddate || null];
+      console.log(`startdate: ${searchDate.startdate}, enddate: ${searchDate.enddate}`);
+
       const results = await pool.query(query, params);
       return results.rows;
     } catch (error) {
@@ -57,6 +89,7 @@ export default class Dashboard {
       throw error;
     }
   }
+
 
   static async getRevenueSources(pool, searchDate = '') {
     try {
