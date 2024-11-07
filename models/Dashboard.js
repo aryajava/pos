@@ -37,7 +37,6 @@ export default class Dashboard {
 
   static async getMonthlyEarning(pool, searchDate = {}) {
     try {
-      // SQL Query with searchDate conditions applied directly
       let query = `
           SELECT
             COALESCE(saa.month, puu.month) as "month",
@@ -80,8 +79,6 @@ export default class Dashboard {
         `;
 
       const params = [searchDate.startdate || null, searchDate.enddate || null];
-      console.log(`startdate: ${searchDate.startdate}, enddate: ${searchDate.enddate}`);
-
       const results = await pool.query(query, params);
       return results.rows;
     } catch (error) {
