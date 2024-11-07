@@ -46,7 +46,8 @@ export default (pool) => {
   // financial summary
   router.get('/api/summary', checkSession, checkRoleOperator, async function (req, res, next) {
     try {
-      const data = await Dashboard.getFinancialSummary(pool);
+      const { startdate, enddate } = req.query;
+      const data = await Dashboard.getFinancialSummary(pool, { startdate, enddate });
       res.status(200).json({ data });
     } catch (error) {
       error.message = "Error getFinancialSummary: " + error.message;

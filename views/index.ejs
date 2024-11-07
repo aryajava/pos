@@ -413,6 +413,7 @@
           $.ajax({
             url: `dashboard/api/summary`,
             method: 'GET',
+            data: { startdate, enddate },
             success: function (response) {
               if (response && response.data) {
                 const summaryData = response.data;
@@ -476,7 +477,7 @@
           const dtMonthlyEarning = $("#dataTableMonthlyEarning").DataTable({
             responsive: true,
             searching: true,
-            lengthMenu: [10, 100],
+            lengthMenu: [3, 10, 100],
             language: {
               emptyTable: "No data available in table",
               lengthMenu: "Show _MENU_ entries",
