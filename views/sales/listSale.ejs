@@ -105,24 +105,24 @@
             { data: "invoice", type: "invoice" },
             { data: "time" },
             {
-              data: "totalsum",
+              data: "totalsum", className: 'sale-totalsum',
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
             {
-              data: "pay",
+              data: "pay", className: 'sale-pay',
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
             {
-              data: "change",
+              data: "change", className: 'sale-change',
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
-            { data: "customername" },
+            { data: "customername", className: 'sale-customername' },
             {
               data: "invoice",
               render: function (data, type, row) {
@@ -142,6 +142,7 @@
             },
           ],
           createdRow: function (row, data, dataIndex) {
+            $(row).attr('id', `sale-${data.invoice}`);
             $('td', row).addClass('align-middle');
           }
         });

@@ -6,6 +6,7 @@ import Purchase from '../models/Purchase.js';
 import PurchaseItem from '../models/PurchaseItem.js';
 import moment from 'moment/moment.js';
 import Goods from '../models/Goods.js';
+import { emitRemoveStockAlertToAdmins, emitStockAlertToAdmins } from './socket.js';
 const router = express.Router();
 
 export default (pool) => {
@@ -101,17 +102,7 @@ export default (pool) => {
     const { invoice, supplier } = req.body;
     try {
       const purchaseData = await Purchase.update(pool, invoice, { supplier });
-      const lowStockGoods = await Goods.checkStockLow(pool);
-      lowStockGoods.forEach((item) => {
-        req.app.get('io').emit('stockAlert', { barcode: item.barcode, stock: item.stock, name: item.name });
-      });
-      const purchaseItems = await PurchaseItem.findAllByInvoice(pool, invoice);
-      await Promise.all(purchaseItems.map(async (item) => {
-        const goods = await Goods.findByBarcode(pool, item.itemcode);
-        if (goods.stock > 5) {
-          req.app.get('io').emit('removeStockAlert', { barcode: item.itemcode, name: goods.name });
-        }
-      }));
+      await emitStockAlertToAdmins(req.app.get('io'));
       const purchaseUpdated = await Purchase.findbyInvoice({ pool, invoice: purchaseData.invoice });
       req.app.get('io').emit('purchaseUpdated', purchaseUpdated);
       res.json({ success: true, message: 'Purchase successfully updated' });
@@ -125,14 +116,7 @@ export default (pool) => {
     const invoice = req.params.invoice;
     try {
       await Purchase.delete(pool, invoice);
-      const lowStockItems = await Goods.checkStockLow(pool);
-      lowStockItems.forEach((item) => {
-        req.app.get('io').emit('stockAlert', {
-          barcode: item.barcode,
-          stock: item.stock,
-          name: item.name,
-        });
-      });
+      await emitStockAlertToAdmins(req.app.get('io'));
       req.app.get('io').emit('purchaseDeleted', invoice);
       res.json({ success: true, message: 'Purchase successfully deleted' });
     } catch (error) {
@@ -155,7 +139,12 @@ export default (pool) => {
   router.post('/api/purchase/:invoice/item', checkSession, purchaseItemFormValidation, async function (req, res) {
     const { invoice, itemcode, quantity, purchaseprice, totalprice } = req.body;
     try {
-      await PurchaseItem.addItem(pool, { invoice, itemcode, quantity, purchaseprice, totalprice });
+      const AddedItem = await PurchaseItem.addItem(pool, { invoice, itemcode, quantity, purchaseprice, totalprice });
+      const goods = await Goods.findByBarcode(pool, AddedItem.itemcode);
+      if (goods.stock > 5) {
+        emitRemoveStockAlertToAdmins(req.app.get('io'), goods);
+      }
+      await emitStockAlertToAdmins(req.app.get('io'));
       res.json({ success: true, message: 'Item successfully added' });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -170,6 +159,11 @@ export default (pool) => {
       if (!deletedItem) {
         return res.status(404).json({ success: false, message: 'Item not found' });
       }
+      const goods = await Goods.findByBarcode(pool, deletedItem.itemcode);
+      if (goods.stock > 5) {
+        emitRemoveStockAlertToAdmins(req.app.get('io'), goods);
+      }
+      await emitStockAlertToAdmins(req.app.get('io'));
       res.json({ success: true, message: 'Item successfully deleted' });
     } catch (error) {
       console.error(`Error deleting item: ${error.message}`);

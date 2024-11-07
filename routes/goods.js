@@ -1,5 +1,4 @@
 import express from 'express';
-import { io } from '../bin/www';
 import fs from 'fs';
 import path from 'path';
 import sharp from 'sharp';
@@ -7,6 +6,7 @@ import { checkSession } from '../middlewares/checkSession.js';
 import { checkRoleOperator } from '../middlewares/checkOwnership.js';
 import { goodsFormAddValidation, goodsFormUpdateValidation } from '../middlewares/formValidation.js';
 import Goods from '../models/Goods.js';
+import { emitRemoveStockAlertToAdmins, emitStockAlertToAdmins } from './socket.js';
 const router = express.Router();
 const __dirname = import.meta.url.replace('file://', '');
 
@@ -54,12 +54,7 @@ export default (pool) => {
       }
       const goodsAdded = await Goods.save(pool, newGoods);
       goodsAdded.picture = picture ? `/asset/goods/${barcode}/${picture}` : null;
-      const checkStockLow = await Goods.checkStockLow(pool);
-      if (checkStockLow.length > 0) {
-        checkStockLow.forEach((item) => {
-          req.app.get('io').emit('stockAlert', { name: item.name, stock: item.stock, barcode: item.barcode, });
-        });
-      }
+      emitStockAlertToAdmins(req.app.get('io'));
       req.app.get('io').emit('goodsAdded', goodsAdded);
       res.redirect('/goods');
     } catch (error) {
@@ -124,9 +119,9 @@ export default (pool) => {
       const updatedGoods = await Goods.update(pool, newGoods);
       updatedGoods.picture = updatedGoods.picture ? `/asset/goods/${barcode}/${updatedGoods.picture}` : null;
       if (updatedGoods.stock <= 5) {
-        req.app.get('io').emit('stockAlert', { name: updatedGoods.name, stock: updatedGoods.stock, barcode: updatedGoods.barcode });
+        emitStockAlertToAdmins(req.app.get('io'));
       } else {
-        req.app.get('io').emit('removeStockAlert', { barcode: updatedGoods.barcode });
+        emitRemoveStockAlertToAdmins(req.app.get('io'), updatedGoods);
       }
       console.log(`goodsUpdated: ${JSON.stringify(updatedGoods)}`);
       req.app.get('io').emit('goodsUpdated', updatedGoods);
@@ -143,13 +138,13 @@ export default (pool) => {
   router.delete('/delete/:barcode', checkSession, checkRoleOperator, async (req, res, next) => {
     const { barcode } = req.params;
     try {
-      await Goods.delete(pool, barcode);
+      const goodsDeleted = await Goods.delete(pool, barcode);
       const dir = path.join(__dirname, "../../public/asset/goods/", barcode);
       if (fs.existsSync(dir)) {
         fs.rmSync(dir, { recursive: true });
       }
       req.app.get('io').emit('goodsDeleted', barcode);
-      req.app.get('io').emit('removeStockAlert', { barcode });
+      emitRemoveStockAlertToAdmins(req.app.get('io'), goodsDeleted);
       res.json({ message: "Goods deleted" });
     } catch (error) {
       console.error("Error delete goods:", error);

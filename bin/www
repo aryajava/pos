@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-import app from '../app.js';
+import app, { sessionMiddleware } from '../app.js';
 import debug from 'debug';
 import http from 'http';
 import { Server } from 'socket.io';
@@ -43,22 +43,33 @@ app.set('port', port);
  */
 
 const server = http.createServer(app);
-export const io = new Server(server, {
+const io = new Server(server, {
   cors: {
     origin: '*',
   }
 });
 
-app.set('io', io);
+io.engine.use(sessionMiddleware);
 
 io.on('connection', (socket) => {
   console.log('New client connected');
-  checkStock(socket);
+  const session = socket.request.session;
+  if (session && session.user) {
+    socket.userRole = session.user.role;
+    if (socket.userRole === 'admin') {
+      checkStock(socket);
+    }
+  } else {
+    console.log('User session not found or not authenticated');
+    return;
+  }
+
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
 });
 
+app.set('io', io);
 
 /**
  * Event listener for HTTP server "error" event.

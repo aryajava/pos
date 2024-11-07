@@ -1,10 +1,12 @@
 import express from 'express';
 import { checkSession } from '../middlewares/checkSession.js';
+import { checkOwnershipSales } from '../middlewares/checkOwnership.js';
 import { saleFormValidation, saleItemFormValidation } from '../middlewares/formValidation.js';
 import moment from 'moment/moment.js';
 import Sale from '../models/Sale.js';
 import SaleItem from '../models/SaleItem.js';
-import { checkOwnershipSales } from '../middlewares/checkOwnership.js';
+import Goods from '../models/Goods.js';
+import { emitRemoveStockAlertToAdmins, emitStockAlertToAdmins } from './socket.js';
 const router = express.Router();
 
 export default (pool) => {
@@ -28,6 +30,8 @@ export default (pool) => {
       const newSale = new Sale(pool, null, operator);
       try {
         const createdSale = await Sale.create(newSale);
+        const saleAdded = await Sale.findbyInvoice({ pool, invoice: createdSale.invoice });
+        req.app.get('io').emit('saleAdded', { ...saleAdded, time: moment(saleAdded.time).format('DD MMM YYYY HH:mm:ss') });
         invoice = createdSale.invoice;
         req.session.currentInvoice = invoice;
       } catch (error) {
@@ -98,7 +102,10 @@ export default (pool) => {
     const { invoice, pay, change, customer } = req.body;
     const saleData = { pay, change, customer };
     try {
-      await Sale.update(pool, invoice, saleData);
+      const saleAdded = await Sale.update(pool, invoice, saleData);
+      await emitStockAlertToAdmins(req.app.get('io'));
+      const saleUpdated = await Sale.findbyInvoice({ pool, invoice: saleAdded.invoice });
+      req.app.get('io').emit('saleUpdated', saleUpdated);
       res.json({ success: true, message: 'Sale successfully updated' });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -109,12 +116,15 @@ export default (pool) => {
   router.delete('/delete/:invoice', checkSession, checkOwnershipSales, async function (req, res) {
     const invoice = req.params.invoice;
     try {
-      await Sale.delete(pool, invoice);
+      const saleDeleted = await Sale.delete(pool, invoice);
+      emitRemoveStockAlertToAdmins(req.app.get('io'), saleDeleted);
+      req.app.get('io').emit('saleDeleted', invoice);
       res.json({ success: true, message: 'Sale successfully deleted' });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
   });
+
 
   // get list sale item by invoice
   router.get('/api/sale/:invoice/items', checkSession, async function (req, res) {
@@ -132,7 +142,17 @@ export default (pool) => {
     const { invoice, itemcode, quantity, sellingprice, totalprice } = req.body;
     const itemData = { invoice, itemcode, quantity, sellingprice, totalprice };
     try {
+      const availableStock = await SaleItem.checkStock(pool, itemcode, quantity);
+      if (!availableStock) {
+        req.flash('error', 'Quantity exceeds stock');
+        return res.status(400).json({ success: false, message: 'Quantity exceeds stock', redirect: `/sales/edit/${invoice}` });
+      }
       const addedItem = await SaleItem.addItem(pool, itemData);
+      const goods = await Goods.findByBarcode(pool, itemcode);
+      if (goods.stock > 5) {
+        emitRemoveStockAlertToAdmins(req.app.get('io'), goods);
+      }
+      await emitStockAlertToAdmins(req.app.get('io'));
       res.json({ data: addedItem });
     } catch (error) {
       res.status(500).json({ error: error.message });
@@ -143,7 +163,15 @@ export default (pool) => {
   router.delete('/api/sale/:invoice/item/:id', checkSession, async function (req, res) {
     const { id } = req.params;
     try {
-      await SaleItem.deleteItem(pool, id);
+      const deletedItem = await SaleItem.deleteItem(pool, parseInt(id));
+      if (!deletedItem) {
+        return res.status(404).json({ success: false, message: 'Item not found' });
+      }
+      const goods = await Goods.findByBarcode(pool, deletedItem.itemcode);
+      if (goods.stock > 5) {
+        emitRemoveStockAlertToAdmins(req.app.get('io'), goods);
+      }
+      await emitStockAlertToAdmins(req.app.get('io'));
       res.json({ success: true, message: 'Item successfully deleted' });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });

@@ -237,6 +237,8 @@
   });
 
   socket.on('stockAlert', (data) => {
+    console.log(`Stock Alert: ${data.name} only have stock: ${data.stock}, time: ${new Date()}`);
+
     const alertContainer = $('#alertContainer');
     const alertCounter = $('#alertCounter');
 
@@ -270,6 +272,8 @@
   });
 
   socket.on('removeStockAlert', (data) => {
+    console.log(`Remove Stock Alert: ${data.name}, time: ${new Date()}`);
+
     const alertContainer = $('#alertContainer');
     const alertCounter = $('#alertCounter');
     alertContainer.find(`.dropdown-item[data-barcode="${data.barcode}"]`).remove();

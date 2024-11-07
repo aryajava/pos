@@ -30,6 +30,13 @@ pool.connect((err, client, release) => {
   }
 });
 
+export const sessionMiddleware = session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+});
+
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
@@ -55,14 +62,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
-  })
-);
+app.use(sessionMiddleware);
 
 app.use(flash());
 app.use((req, res, next) => {

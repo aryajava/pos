@@ -24,6 +24,25 @@ export default class SaleItem {
     }
   };
 
+  static async checkStock(pool, itemcode, quantity) {
+    try {
+      const query = `
+        SELECT stock
+        FROM goods
+        WHERE barcode = $1
+      `;
+      const result = await pool.query(query, [itemcode]);
+      const stock = result.rows[0].stock;
+      if (stock < quantity) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      error.message = "Error checkStock: " + error.message;
+      throw error;
+    }
+  }
+
   static async addItem(pool, itemData) {
     let { invoice, itemcode, quantity, sellingprice, totalprice } = itemData;
     quantity = parseInt(quantity);
