@@ -31,34 +31,35 @@
                     <span class="text">Add</span>
                   </a>
                 </div>
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTablePurchase" width="100%"
-                      aria-describedby="dataTable_info" cellspacing="0">
-                      <thead>
-                        <tr role="row">
-                          <th class="align-content-center">Invoice</th>
-                          <th class="align-content-center">Time</th>
-                          <th class="align-content-center">Total Summary</th>
-                          <th class="align-content-center">Supplier</th>
-                          <th class="align-content-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tfoot>
-                        <tr>
-                          <th>Invoice</th>
-                          <th>Time</th>
-                          <th>Total Summary</th>
-                          <th>Supplier</th>
-                          <th>Action</th>
-                        </tr>
-                      </tfoot>
-                      <tbody>
-                        <!-- DataTables will populate this section -->
-                      </tbody>
-                    </table>
+                <%- include('../partials/alert') %>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="dataTablePurchase" width="100%"
+                        aria-describedby="dataTable_info" cellspacing="0">
+                        <thead>
+                          <tr role="row">
+                            <th class="align-content-center">Invoice</th>
+                            <th class="align-content-center">Time</th>
+                            <th class="align-content-center">Total Summary</th>
+                            <th class="align-content-center">Supplier</th>
+                            <th class="align-content-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr>
+                            <th>Invoice</th>
+                            <th>Time</th>
+                            <th>Total Summary</th>
+                            <th>Supplier</th>
+                            <th>Action</th>
+                          </tr>
+                        </tfoot>
+                        <tbody>
+                          <!-- DataTables will populate this section -->
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
               </div>
 
             </div>
@@ -97,15 +98,15 @@
             dataSrc: "data",
           },
           columns: [
-            { data: "invoice", type: "invoice" },
-            { data: "time" },
+            { data: "invoice", type: "string" },
+            { data: "time", type: "date" },
             {
-              data: "totalsum", className: 'purchase-totalsum',
+              data: "totalsum", className: 'purchase-totalsum', type: "number",
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
-            { data: "suppliername", className: 'purchase-suppliername' },
+            { data: "suppliername", className: 'purchase-suppliername', type: "string" },
             {
               data: "invoice",
               render: function (data, type, row) {

@@ -12,6 +12,10 @@ label {
   align-items: center;
 }
 
+.alert {
+  border-radius: unset !important;
+}
+
 @media (max-width: 576px) {
   .action-buttons {
     display: inline-flex;
@@ -37,6 +41,13 @@ table.dataTable td.dt-type-numeric {
   border-right: none !important;
   border-top: .12rem solid #dee2e6 !important;
   border-bottom: .12rem solid #dee2e6 !important;
+}
+
+table.dataTable th.dt-type-numeric,
+table.dataTable th.dt-type-date,
+table.dataTable td.dt-type-numeric,
+table.dataTable td.dt-type-date {
+  text-align: left !important;
 }
 
 #dataTablePurchaseItems.table-bordered,

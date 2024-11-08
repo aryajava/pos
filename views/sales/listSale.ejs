@@ -31,38 +31,39 @@
                     <span class="text">Add</span>
                   </a>
                 </div>
-                <div class="card-body">
-                  <div class="table-responsive">
-                    <table class="table table-bordered" id="dataTableSale" width="100%"
-                      aria-describedby="dataTable_info" cellspacing="0">
-                      <thead>
-                        <tr role="row">
-                          <th class="align-content-center">Invoice</th>
-                          <th class="align-content-center">Time</th>
-                          <th class="align-content-center">Total Summary</th>
-                          <th class="align-content-center">Pay</th>
-                          <th class="align-content-center">Change</th>
-                          <th class="align-content-center">Customer</th>
-                          <th class="align-content-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tfoot>
-                        <tr>
-                          <th>Invoice</th>
-                          <th>Time</th>
-                          <th>Total Summary</th>
-                          <th>Pay</th>
-                          <th>Change</th>
-                          <th>Customer</th>
-                          <th>Action</th>
-                        </tr>
-                      </tfoot>
-                      <tbody>
-                        <!-- DataTables will populate this section -->
-                      </tbody>
-                    </table>
+                <%- include('../partials/alert') %>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-bordered" id="dataTableSale" width="100%"
+                        aria-describedby="dataTable_info" cellspacing="0">
+                        <thead>
+                          <tr role="row">
+                            <th class="align-content-center">Invoice</th>
+                            <th class="align-content-center">Time</th>
+                            <th class="align-content-center">Total Summary</th>
+                            <th class="align-content-center">Pay</th>
+                            <th class="align-content-center">Change</th>
+                            <th class="align-content-center">Customer</th>
+                            <th class="align-content-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tfoot>
+                          <tr>
+                            <th>Invoice</th>
+                            <th>Time</th>
+                            <th>Total Summary</th>
+                            <th>Pay</th>
+                            <th>Change</th>
+                            <th>Customer</th>
+                            <th>Action</th>
+                          </tr>
+                        </tfoot>
+                        <tbody>
+                          <!-- DataTables will populate this section -->
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
               </div>
 
             </div>
@@ -102,27 +103,27 @@
             dataSrc: "data",
           },
           columns: [
-            { data: "invoice", type: "invoice" },
-            { data: "time" },
+            { data: "invoice", type: "string" },
+            { data: "time", type: "date" },
             {
-              data: "totalsum", className: 'sale-totalsum',
+              data: "totalsum", className: 'sale-totalsum', type: "number",
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
             {
-              data: "pay", className: 'sale-pay',
+              data: "pay", className: 'sale-pay', type: "number",
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
             {
-              data: "change", className: 'sale-change',
+              data: "change", className: 'sale-change', type: "number",
               render: function (data, type, row) {
                 return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(data);
               }
             },
-            { data: "customername", className: 'sale-customername' },
+            { data: "customername", className: 'sale-customername', type: "string" },
             {
               data: "invoice",
               render: function (data, type, row) {

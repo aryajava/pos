@@ -15,14 +15,17 @@ export const checkOwnershipPurchase = async (req, res, next) => {
   try {
     const purchase = await Purchase.findbyInvoice({ pool, invoice });
     if (!purchase) {
-      return res.status(404).json({ success: false, message: 'Purchase not found' });
+      req.flash('error', 'Purchase not found');
+      return res.redirect(`/purchases`);
     }
     if (purchase.operator !== userId) {
-      return res.status(403).json({ success: false, message: 'You do not have permission to access this resource' });
+      req.flash('error', 'You do not have permission to access this resource');
+      return res.redirect(`/purchases`);
     }
     next();
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    req.flash('error', error.message);
+    res.redirect(`/purchases`);
   }
 };
 
@@ -32,13 +35,16 @@ export const checkOwnershipSales = async (req, res, next) => {
   try {
     const sale = await Sale.findbyInvoice({ pool, invoice });
     if (!sale) {
-      return res.status(404).json({ success: false, message: 'Sale not found' });
+      req.flash('error', 'Sale not found');
+      return res.redirect(`/sales`);
     }
     if (sale.operator !== userId) {
-      return res.status(403).json({ success: false, message: 'You do not have permission to access this resource' });
+      req.flash('error', 'You do not have permission to access this resource');
+      return res.redirect(`/sales`);
     }
     next();
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    req.flash('error', error.message);
+    res.redirect(`/sales`);
   }
 };

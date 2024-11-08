@@ -37,7 +37,7 @@
       <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
       <div class="modal-footer">
         <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-        <a class="btn btn-primary" href="/logout" onclick="handleLogout()">Logout</a>
+        <a class="btn btn-primary" href="/logout" onclick="handleConnection()">Logout</a>
       </div>
     </div>
   </div>
@@ -282,15 +282,11 @@
     return urlParams.get(param);
   }
 
-  function handleLogout() {
-    // Periksa apakah socket masih terhubung
+  function handleConnection() {
     if (socket && socket.connected) {
-      socket.disconnect();  // Menutup koneksi socket
+      socket.disconnect();
     }
-    // Redirect ke halaman logout
-    window.location.href = '/logout';
   }
-
   // Set goodsBarcode if barcode is present in query string
   $(document).ready(function () {
     const barcode = getQueryParam('barcode');
