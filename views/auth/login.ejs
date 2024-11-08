@@ -36,7 +36,7 @@
                               Me</label>
                           </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-user btn-block">
+                        <button type="submit" class="btn btn-primary btn-user btn-block" onclick="handleConnection()">
                           Login
                         </button>
                         <hr>
@@ -57,37 +57,4 @@
     </div>
 
     <%- include('../partials/jsScripts') %>
-      <script>
-        document.querySelector('form.user').addEventListener('submit', async (event) => {
-          event.preventDefault();
-
-          const formData = new FormData(event.target);
-          const data = {
-            email: formData.get('email'),
-            password: formData.get('password'),
-          };
-
-          try {
-            const response = await fetch('/', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-              if (window.socket) {
-                window.socket.disconnect();
-              }
-              window.socket = io();
-              window.location.href = "/";
-            } else {
-              const errorData = await response.json();
-              alert(errorData.message || 'Login failed');
-            }
-          } catch (error) {
-            console.error('Login error:', error);
-            alert('An unexpected error occurred');
-          }
-        });
-      </script>
       <%- include('../partials/layoutBottom') %>
