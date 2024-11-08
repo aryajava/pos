@@ -170,8 +170,10 @@
     <!-- End of Page Wrapper -->
     <%- include('../partials/jsScripts') %>
       <script>
-        let totalPrice = 0;
+
+        const invoice = `<%= purchaseData ? purchaseData.invoice : '' %>`;
         const isEdit = `<%= typeof purchaseData !== 'undefined' %>`;
+        let totalPrice = 0;
         let itemToDelete = null;
 
         const calculateTotalPrice = () => {
@@ -197,7 +199,6 @@
         };
 
         $(document).ready(function () {
-          const invoice = $("#invoice").val();
           // Initialize DataTable for purchaseItems
           $("#dataTablePurchaseItems").DataTable({
             responsive: true,

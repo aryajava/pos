@@ -181,7 +181,7 @@
     <!-- End of Page Wrapper -->
     <%- include('../partials/jsScripts') %>
       <script>
-        const invoice = $("#invoice").val();
+        const invoice = `<%= saleData ? saleData.invoice : '' %>`;
         let totalPrice = 0;
         let itemToDelete = null;
 

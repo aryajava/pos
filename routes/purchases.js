@@ -24,9 +24,9 @@ export default (pool) => {
 
   router.get('/add', checkSession, async function (req, res) {
     const operator = req.session.user.id;
-    let invoice = req.session.currentInvoice;
+    let invoice = req.session.currentInvoice || null;
     const barcodeAlert = req.query.barcode || '';
-    if (!invoice) {
+    if (!invoice || invoice.includes('PENJ')) {
       const newPurchase = new Purchase(pool, null, operator);
       try {
         const createdPurchase = await Purchase.create(newPurchase);
@@ -38,7 +38,6 @@ export default (pool) => {
         return res.status(500).json({ error: error.message });
       }
     }
-
     try {
       const purchaseData = await Purchase.findbyInvoice({ pool, invoice });
       res.render('purchases/formPurchase', {

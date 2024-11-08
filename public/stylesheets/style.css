@@ -12,6 +12,59 @@ label {
   align-items: center;
 }
 
+.fs-1 {
+  font-size: calc(1.1rem + 1.5vw) !important;
+}
+
+.fs-2 {
+  font-size: calc(1.05rem + 0.9vw) !important;
+}
+
+.fs-3 {
+  font-size: calc(1rem + 0.6vw) !important;
+}
+
+.fs-4 {
+  font-size: calc(0.95rem + 0.3vw) !important;
+}
+
+.fs-5 {
+  font-size: 0.9rem !important;
+}
+
+.fs-6 {
+  font-size: 0.85rem !important;
+}
+
+.fw-bold {
+  font-weight: 700 !important;
+}
+
+.fw-bolder {
+  font-weight: bolder !important;
+}
+
+.fw-semibold {
+  font-weight: 600 !important;
+}
+
+.fw-medium {
+  font-weight: 500 !important;
+}
+
+.fw-normal {
+  font-weight: 400 !important;
+}
+
+.fw-light {
+  font-weight: 300 !important;
+}
+
+.fw-lighter {
+  font-weight: lighter !important;
+}
+
+
 .alert {
   border-radius: unset !important;
 }

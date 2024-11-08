@@ -244,18 +244,19 @@
     if (existingAlert.length === 0) {
       // Jika belum ada, tambahkan alert baru
       const alertItem = $(`
-      <a class="dropdown-item d-flex align-items-center" href="#" data-barcode="${data.barcode}" data-name="${data.name}">
-        <div class="mr-3">
-          <div class="icon-circle bg-warning">
-            <i class="fas fa-exclamation-triangle text-white"></i>
+        <a class="dropdown-item d-flex align-items-center" data-barcode="${data.barcode}" data-name="${data.name}">
+          <div class="mr-3">
+            <div class="icon-circle bg-warning">
+              <i class="fas fa-exclamation-triangle text-white"></i>
+            </div>
           </div>
-        </div>
-        <div>
-          <div class="small text-gray-500">${new Date().toLocaleDateString()}</div>
-          <span class="font-weight-bold">Stock Alert: ${data.name} only have stock: ${data.stock}</span>
-        </div>
-      </a>
-    `);
+          <div>
+            <div class="fs-6 fw-light" id="headAlertNotif">Barcode: ${data.barcode}</div>
+            <div class="fs-5 fw-bolder text-wrap" id="bodyeAlertNotif">Stock Alert: ${data.name}</div>
+            <div class="fs-6 fw-medium" id="footAlertNotif">Only have stock: ${data.stock}</div>
+          </div>
+        </a>
+      `);
       alertContainer.append(alertItem);
       alertCounter.text(parseInt(alertCounter.text()) + 1);
 
@@ -265,6 +266,10 @@
         const name = $(this).data('name');
         window.location.href = `/purchases/add?barcode=${barcode}&name=${name}`;
       });
+    } else {
+      existingAlert.find('#headAlertNotif').text(`Barcode: ${data.barcode}`);
+      existingAlert.find('#bodyeAlertNotif').text(`Stock Alert: ${data.name}`);
+      existingAlert.find('#footAlertNotif').text(`only have stock: ${data.stock}`);
     }
   });
 
